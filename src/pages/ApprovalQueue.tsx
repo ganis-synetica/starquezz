@@ -10,6 +10,7 @@ import { useNavigate } from 'react-router-dom'
 import { Star, Pencil, Trash2, Plus, Check, X } from 'lucide-react'
 
 type PendingRow = Awaited<ReturnType<typeof listPendingApprovals>>[number]
+type ChildWithStars = Pick<Child, 'id' | 'name' | 'avatar' | 'stars'>
 
 function dateISOFromTimestamp(ts: string) {
   const d = new Date(ts)
@@ -21,14 +22,16 @@ function dateISOFromTimestamp(ts: string) {
 
 type Tab = 'approvals' | 'rewards' | 'children'
 
+const AVATARS = ['🦊', '🦋', '🐱', '🐶', '🦁', '🐰', '🐼', '🐨', '🦄', '🐸']
+
 export function ApprovalQueue() {
   const { user, signOut } = useAuth()
   const navigate = useNavigate()
 
   const [tab, setTab] = useState<Tab>('approvals')
   const [rows, setRows] = useState<PendingRow[]>([])
-  const [childrenById, setChildrenById] = useState<Record<string, Pick<Child, 'id' | 'name' | 'avatar'>>>({})
-  const [children, setChildren] = useState<Array<Pick<Child, 'id' | 'name' | 'avatar'>>>([])
+  const [childrenById, setChildrenById] = useState<Record<string, ChildWithStars>>({})
+  const [children, setChildren] = useState<ChildWithStars[]>([])
   const [rewards, setRewards] = useState<Reward[]>([])
   const [error, setError] = useState<string | null>(null)
   const [busyId, setBusyId] = useState<string | null>(null)
@@ -43,6 +46,15 @@ export function ApprovalQueue() {
   const [newRewardTitle, setNewRewardTitle] = useState('')
   const [newRewardCost, setNewRewardCost] = useState(10)
 
+  // Child editing
+  const [editingChildId, setEditingChildId] = useState<string | null>(null)
+  const [editChildName, setEditChildName] = useState('')
+  const [editChildAvatar, setEditChildAvatar] = useState('')
+
+  // Add stars
+  const [addStarsChildId, setAddStarsChildId] = useState<string | null>(null)
+  const [addStarsAmount, setAddStarsAmount] = useState(10)
+
   const parentId = user?.id
 
   useEffect(() => {
@@ -52,15 +64,15 @@ export function ApprovalQueue() {
       setError(null)
       const [pending, childrenRes, rewardsRes] = await Promise.all([
         listPendingApprovals(),
-        supabase.from('children').select('id,name,avatar'),
+        supabase.from('children').select('id,name,avatar,stars'),
         supabase.from('rewards').select('*').eq('parent_id', parentId).eq('active', true).order('star_cost'),
       ])
 
       if (childrenRes.error) throw childrenRes.error
       if (rewardsRes.error) throw rewardsRes.error
 
-      const childList = (childrenRes.data ?? []) as Array<Pick<Child, 'id' | 'name' | 'avatar'>>
-      const map: Record<string, Pick<Child, 'id' | 'name' | 'avatar'>> = {}
+      const childList = (childrenRes.data ?? []) as ChildWithStars[]
+      const map: Record<string, ChildWithStars> = {}
       for (const c of childList) {
         map[c.id] = c
       }
@@ -173,7 +185,40 @@ export function ApprovalQueue() {
     }
   }
 
-  // Child management
+  // Child CRUD
+  const startEditChild = (child: ChildWithStars) => {
+    setEditingChildId(child.id)
+    setEditChildName(child.name)
+    setEditChildAvatar(child.avatar || '🦊')
+  }
+
+  const cancelEditChild = () => {
+    setEditingChildId(null)
+    setEditChildName('')
+    setEditChildAvatar('')
+  }
+
+  const saveChild = async (childId: string) => {
+    if (!editChildName.trim()) return
+    setError(null)
+    try {
+      const { error } = await supabase
+        .from('children')
+        .update({ name: editChildName.trim(), avatar: editChildAvatar })
+        .eq('id', childId)
+      if (error) throw error
+      setChildren(prev => prev.map(c => c.id === childId ? { ...c, name: editChildName.trim(), avatar: editChildAvatar } : c))
+      const newMap = { ...childrenById }
+      if (newMap[childId]) {
+        newMap[childId] = { ...newMap[childId], name: editChildName.trim(), avatar: editChildAvatar }
+      }
+      setChildrenById(newMap)
+      cancelEditChild()
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Could not update child.')
+    }
+  }
+
   const deleteChild = async (childId: string, childName: string) => {
     if (!window.confirm(`Delete ${childName}? This will remove all their quests and history.`)) return
     setError(null)
@@ -186,6 +231,41 @@ export function ApprovalQueue() {
       setChildrenById(newMap)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Could not delete child.')
+    }
+  }
+
+  // Add stars
+  const startAddStars = (childId: string) => {
+    setAddStarsChildId(childId)
+    setAddStarsAmount(10)
+  }
+
+  const cancelAddStars = () => {
+    setAddStarsChildId(null)
+    setAddStarsAmount(10)
+  }
+
+  const confirmAddStars = async (childId: string) => {
+    if (addStarsAmount <= 0) return
+    setError(null)
+    try {
+      const child = children.find(c => c.id === childId)
+      if (!child) return
+      const newStars = (child.stars || 0) + addStarsAmount
+      const { error } = await supabase
+        .from('children')
+        .update({ stars: newStars })
+        .eq('id', childId)
+      if (error) throw error
+      setChildren(prev => prev.map(c => c.id === childId ? { ...c, stars: newStars } : c))
+      const newMap = { ...childrenById }
+      if (newMap[childId]) {
+        newMap[childId] = { ...newMap[childId], stars: newStars }
+      }
+      setChildrenById(newMap)
+      cancelAddStars()
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Could not add stars.')
     }
   }
 
@@ -395,20 +475,97 @@ export function ApprovalQueue() {
               {children.map((child) => (
                 <Card key={child.id} className="bg-white">
                   <CardContent className="p-4">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        <div className="text-4xl">{child.avatar}</div>
-                        <p className="font-bold text-xl">{child.name}</p>
+                    {editingChildId === child.id ? (
+                      <div className="space-y-3">
+                        <Input
+                          value={editChildName}
+                          onChange={(e) => setEditChildName(e.target.value)}
+                          placeholder="Child name..."
+                          className="border-2 border-black"
+                        />
+                        <div className="grid grid-cols-5 gap-2">
+                          {AVATARS.map(emoji => (
+                            <button
+                              key={emoji}
+                              type="button"
+                              onClick={() => setEditChildAvatar(emoji)}
+                              className={`text-2xl p-2 rounded-lg border-2 ${
+                                editChildAvatar === emoji 
+                                  ? 'border-purple-500 bg-purple-100' 
+                                  : 'border-gray-200'
+                              }`}
+                            >
+                              {emoji}
+                            </button>
+                          ))}
+                        </div>
+                        <div className="flex gap-2">
+                          <Button size="sm" onClick={() => saveChild(child.id)} className="bg-green-400 text-black">
+                            <Check className="w-4 h-4 mr-1" /> Save
+                          </Button>
+                          <Button size="sm" variant="outline" onClick={cancelEditChild}>
+                            <X className="w-4 h-4 mr-1" /> Cancel
+                          </Button>
+                        </div>
                       </div>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        className="text-red-500"
-                        onClick={() => deleteChild(child.id, child.name)}
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
-                    </div>
+                    ) : addStarsChildId === child.id ? (
+                      <div className="space-y-3">
+                        <div className="flex items-center gap-3">
+                          <div className="text-3xl">{child.avatar}</div>
+                          <div>
+                            <p className="font-bold">{child.name}</p>
+                            <p className="text-sm text-gray-500">Current: ⭐ {child.stars || 0}</p>
+                          </div>
+                        </div>
+                        <div className="flex gap-2 items-center">
+                          <span className="font-bold">Add:</span>
+                          <Input
+                            type="number"
+                            min={1}
+                            value={addStarsAmount}
+                            onChange={(e) => setAddStarsAmount(parseInt(e.target.value) || 1)}
+                            className="border-2 border-black w-24"
+                          />
+                          <span>⭐</span>
+                          <Button size="sm" onClick={() => confirmAddStars(child.id)} className="bg-yellow-400 text-black">
+                            <Check className="w-4 h-4" />
+                          </Button>
+                          <Button size="sm" variant="outline" onClick={cancelAddStars}>
+                            <X className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <div className="text-4xl">{child.avatar}</div>
+                          <div>
+                            <p className="font-bold text-xl">{child.name}</p>
+                            <div className="flex items-center gap-1 text-yellow-600">
+                              <Star className="w-4 h-4 fill-yellow-400" />
+                              <span className="font-black">{child.stars || 0}</span>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="flex gap-2">
+                          <Button size="sm" variant="outline" onClick={() => startAddStars(child.id)} title="Add stars">
+                            <Star className="w-4 h-4 text-yellow-500" />
+                            <Plus className="w-3 h-3" />
+                          </Button>
+                          <Button size="sm" variant="outline" onClick={() => startEditChild(child)}>
+                            <Pencil className="w-4 h-4" />
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="text-red-500"
+                            onClick={() => deleteChild(child.id, child.name)}
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      </div>
+                    )}
                   </CardContent>
                 </Card>
               ))}
