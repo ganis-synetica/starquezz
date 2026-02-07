@@ -22,7 +22,7 @@ function dateISOFromTimestamp(ts: string) {
 
 type Tab = 'approvals' | 'rewards' | 'children'
 
-const AVATARS = ['🦊', '🦋', '🐱', '🐶', '🦁', '🐰', '🐼', '🐨', '🦄', '🐸']
+const AVATARS = ['🦊', '🦋', '🐱', '🐶', '🦁', '🐰', '🐼', '🦝', '🦄', '🐸']
 
 export function ApprovalQueue() {
   const { user, signOut } = useAuth()

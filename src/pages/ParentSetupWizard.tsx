@@ -25,7 +25,7 @@ type RewardDraft = {
   star_cost: number
 }
 
-const AVATARS = ['🦊', '🦋', '🐱', '🐶', '🦁', '🐰', '🐼', '🐨', '🦄', '🐸']
+const AVATARS = ['🦊', '🦋', '🐱', '🐶', '🦁', '🐰', '🐼', '🦝', '🦄', '🐸']
 
 const DEFAULT_HABITS: HabitDraft[] = [
   { id: '1', title: '🎹 Practice Piano', description: '15 minutes', category: 'learning', is_core: true },
