@@ -111,57 +111,52 @@ export async function awardStarsIfNeeded(childId: string, dateISO: string) {
 
   const allCoresApproved = coreHabitIds.size > 0 && Array.from(coreHabitIds).every((id) => approvedHabitIds.has(id))
 
-  const updates: Array<{ id: string; stars_earned: number }> = []
-
+  // Calculate what stars SHOULD be for each completion
+  // Star logic:
+  // - All cores approved = 1 star total (awarded to first core)
+  // - Each bonus = 1 star each (only if all cores are approved)
+  const targetStars = new Map<string, number>()
+  
+  // First, calculate target stars for all approved completions
+  let coreStarAssigned = false
   for (const c of approved) {
     const isCore = coreHabitIds.has(c.habit_id)
     const isBonus = bonusHabitIds.has(c.habit_id)
 
-    let nextStars = c.stars_earned
     if (isCore) {
-      nextStars = 0
+      // First core gets 1 star if all cores approved, rest get 0
+      if (allCoresApproved && !coreStarAssigned) {
+        targetStars.set(c.id, 1)
+        coreStarAssigned = true
+      } else {
+        targetStars.set(c.id, 0)
+      }
     } else if (isBonus) {
-      nextStars = allCoresApproved ? 1 : 0
+      // Each bonus gets 1 star if all cores approved
+      targetStars.set(c.id, allCoresApproved ? 1 : 0)
     }
-
-    if (nextStars !== c.stars_earned) updates.push({ id: c.id, stars_earned: nextStars })
   }
 
-  const alreadyHasCoreAward = approved.some((c) => coreHabitIds.has(c.habit_id) && c.stars_earned === 1)
-  if (allCoresApproved && !alreadyHasCoreAward) {
-    const firstCore = approved.find((c) => coreHabitIds.has(c.habit_id))
-    if (firstCore) updates.push({ id: firstCore.id, stars_earned: 1 })
-  }
-
-  if (updates.length > 0) {
-    for (const upd of updates) {
+  // Update completions that have wrong star values
+  for (const c of approved) {
+    const target = targetStars.get(c.id) ?? 0
+    if (c.stars_earned !== target) {
       const { error: updateError } = await supabase
         .from('habit_completions')
-        .update({ stars_earned: upd.stars_earned })
-        .eq('id', upd.id)
+        .update({ stars_earned: target })
+        .eq('id', c.id)
 
       if (updateError) throw updateError
     }
   }
 
-  const { data: totalData, error: totalError } = await supabase
-    .from('habit_completions')
-    .select('stars_earned')
-    .eq('child_id', childId)
-    .eq('completed_date', dateISO)
-    .not('approved_at', 'is', null)
-    .is('rejected_at', null)
+  // Calculate day total
+  const dayStars = Array.from(targetStars.values()).reduce((sum, s) => sum + s, 0)
 
-  if (totalError) throw totalError
-  const dayStars = (totalData as Array<{ stars_earned: number }>).reduce((sum, r) => sum + r.stars_earned, 0)
-
-  const { data: childData, error: childError } = await supabase.from('children').select('stars').eq('id', childId).single()
-  if (childError) throw childError
-  const currentStars = (childData as { stars: number }).stars
-
+  // Update child's total stars from ALL approved completions
   const { data: allApprovedData, error: allApprovedError } = await supabase
     .from('habit_completions')
-    .select('stars_earned,completed_date')
+    .select('stars_earned')
     .eq('child_id', childId)
     .not('approved_at', 'is', null)
     .is('rejected_at', null)
@@ -169,6 +164,10 @@ export async function awardStarsIfNeeded(childId: string, dateISO: string) {
   if (allApprovedError) throw allApprovedError
 
   const approvedTotal = (allApprovedData as Array<{ stars_earned: number }>).reduce((sum, r) => sum + r.stars_earned, 0)
+
+  const { data: childData, error: childError } = await supabase.from('children').select('stars').eq('id', childId).single()
+  if (childError) throw childError
+  const currentStars = (childData as { stars: number }).stars
 
   if (currentStars !== approvedTotal) {
     const { error: updateChildError } = await supabase.from('children').update({ stars: approvedTotal }).eq('id', childId)
