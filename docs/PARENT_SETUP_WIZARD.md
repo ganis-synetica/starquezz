@@ -23,9 +23,8 @@ Login/Signup → Has children?
 - "What's your child's name?"
 - Text input for name
 - "Choose an avatar" (emoji grid: 🦊🦋🐱🐶🦁🐰🐼🐨🦄🐸)
-- "Set a 4-digit PIN for [name]"
-- PIN pad (enter twice to confirm)
 - "Add Child" button
+- **No PIN required** — kids just tap their profile to switch
 
 ### Step 3: Add Habits
 - "What should [child] do daily?"
@@ -82,8 +81,7 @@ Login/Signup → Has children?
 - Redirect logic in `ParentDashboard` or after login
 
 ### Database Changes
-None needed - uses existing tables:
-- `children` - name, avatar, pin_hash, parent_id
+- `children.pin_hash` - Now optional (nullable), no longer required
 - `habits` - title, description, category, is_core, child_id, parent_id
 - `rewards` - title, description, star_cost, parent_id
 
@@ -97,9 +95,20 @@ None needed - uses existing tables:
 
 ### Validation
 - Child name: required, 2-20 chars
-- PIN: exactly 4 digits, must match confirmation
 - Habits: minimum 2
 - Rewards: minimum 1
+
+## Parent Management Features
+
+### Delete Child Profile
+- Parent can delete a child from Settings
+- Confirmation required: "Delete [name]? This removes all their quests and history."
+- Soft delete (mark inactive) or hard delete
+
+### Manage Star Store
+- Parent can add/edit/remove rewards
+- Set title, description, star cost
+- Toggle active/inactive
 
 ### Error Handling
 - Show inline errors

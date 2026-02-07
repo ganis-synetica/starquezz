@@ -14,6 +14,7 @@ export function HomePage() {
 
   const [kids, setKids] = useState<Array<Pick<Child, 'id' | 'name' | 'stars' | 'avatar'>>>([])
   const [error, setError] = useState<string | null>(null)
+  const [loading, setLoading] = useState(true)
 
   // Check onboarding status
   useEffect(() => {
@@ -23,8 +24,11 @@ export function HomePage() {
   }, [navigate])
 
   useEffect(() => {
+    if (status === 'loading') return
+    
     if (status !== 'authenticated' || !user) {
       setKids([])
+      setLoading(false)
       return
     }
 
@@ -37,11 +41,22 @@ export function HomePage() {
 
       if (fetchError) {
         setError(fetchError.message)
+        setLoading(false)
         return
       }
-      setKids((data ?? []) as Array<Pick<Child, 'id' | 'name' | 'stars' | 'avatar'>>)
+      
+      const children = (data ?? []) as Array<Pick<Child, 'id' | 'name' | 'stars' | 'avatar'>>
+      
+      // If logged in but no children, redirect to setup wizard
+      if (children.length === 0) {
+        navigate('/parent/setup')
+        return
+      }
+      
+      setKids(children)
+      setLoading(false)
     })()
-  }, [status, user])
+  }, [status, user, navigate])
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-yellow-200 to-orange-200 p-6">
@@ -61,16 +76,19 @@ export function HomePage() {
         <div className="space-y-4 mb-8">
           <h2 className="text-xl font-bold text-center">Who's ready to quest?</h2>
           {error && <p className="text-sm font-bold text-red-700 text-center">{error}</p>}
-          {status !== 'authenticated' && (
+          {loading && status === 'authenticated' && (
+            <p className="text-sm font-bold text-gray-700 text-center">Loading...</p>
+          )}
+          {!loading && status !== 'authenticated' && (
             <p className="text-sm font-bold text-gray-700 text-center">
-              Parents: log in to load real profiles.
+              Parents: log in to get started.
             </p>
           )}
           {kids.map((kid) => (
             <Card 
               key={kid.id} 
               className="cursor-pointer hover:translate-x-1 hover:translate-y-1 hover:shadow-none transition-all bg-white"
-              onClick={() => navigate(`/pin/${kid.id}`)}
+              onClick={() => navigate(`/child/${kid.id}`)}
             >
               <CardContent className="p-4">
                 <div className="flex items-center gap-4">

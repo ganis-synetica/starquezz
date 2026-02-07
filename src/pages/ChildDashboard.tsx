@@ -22,7 +22,7 @@ function todayISO() {
 export function ChildDashboard() {
   const { id } = useParams()
   const navigate = useNavigate()
-  const { childId: sessionChildId, logoutChild } = useChildSession()
+  useChildSession() // Just to ensure context is available
 
   const childId = id
   const dateISO = useMemo(() => todayISO(), [])
@@ -33,10 +33,6 @@ export function ChildDashboard() {
 
   useEffect(() => {
     if (!childId) return
-    if (sessionChildId && sessionChildId !== childId) {
-      navigate('/')
-      return
-    }
 
     void (async () => {
       setError(null)
@@ -68,7 +64,7 @@ export function ChildDashboard() {
     })().catch((err) => {
       setError(err instanceof Error ? err.message : 'Something went wrong loading quests.')
     })
-  }, [childId, dateISO, navigate, sessionChildId])
+  }, [childId, dateISO, navigate])
 
   const coreCompleted = habits.filter((h) => h.is_core && h.completed).length
   const totalCore = habits.filter((h) => h.is_core).length
@@ -216,12 +212,9 @@ export function ChildDashboard() {
         <Button
           className="w-full mt-3"
           variant="outline"
-          onClick={() => {
-            logoutChild()
-            navigate('/')
-          }}
+          onClick={() => navigate('/')}
         >
-          Logout
+          Switch Profile
         </Button>
       </div>
     </div>
