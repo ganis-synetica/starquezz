@@ -6,6 +6,8 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 
 const PARENT_PIN_SESSION_KEY = 'starquezz.parent_pin_session'
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL as string
+const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY as string
 const SESSION_DURATION_MS = 30 * 60 * 1000 // 30 minutes
 
 export function checkParentPinSession(): boolean {
@@ -54,28 +56,42 @@ export function ParentPinEntry() {
 
     // Check if parent has a PIN set
     void (async () => {
-      const { data, error } = await supabase
-        .from('parents')
-        .select('pin_hash')
-        .eq('id', user.id)
-        .single()
+      try {
+        const { data, error } = await supabase
+          .from('parents')
+          .select('pin_hash')
+          .eq('id', user.id)
+          .single()
 
-      if (error) {
-        // Parent record might not exist, create it
-        if (error.code === 'PGRST116') {
-          await supabase.from('parents').insert({ id: user.id, email: user.email || '' })
+        if (error) {
+          // Parent record might not exist, create it
+          if (error.code === 'PGRST116') {
+            const { error: insertError } = await supabase.from('parents').insert({ id: user.id, email: user.email || '' })
+            if (insertError) {
+              setError(insertError.message)
+              setHasPin(false)
+              setMode('set')
+              return
+            }
+            setHasPin(false)
+            setMode('set')
+            return
+          }
+          setError(error.message)
           setHasPin(false)
           setMode('set')
           return
         }
-        setError(error.message)
-        return
-      }
 
-      if (data?.pin_hash) {
-        setHasPin(true)
-        setMode('enter')
-      } else {
+        if (data?.pin_hash) {
+          setHasPin(true)
+          setMode('enter')
+        } else {
+          setHasPin(false)
+          setMode('set')
+        }
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Could not load PIN status')
         setHasPin(false)
         setMode('set')
       }
@@ -116,18 +132,28 @@ export function ParentPinEntry() {
     setError(null)
 
     try {
-      // Hash the PIN using Edge Function
+      const { data: { session } } = await supabase.auth.getSession()
+      const token = session?.access_token ?? SUPABASE_ANON_KEY
+
       const response = await fetch(
-        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/verify-pin`,
+        `${SUPABASE_URL}/functions/v1/verify-pin`,
         {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
           body: JSON.stringify({ action: 'hash', pin }),
         }
       )
 
-      const result = await response.json()
-      if (!result.hash) throw new Error('Failed to hash PIN')
+      const result = (await response.json()) as { hash?: string; error?: string }
+      if (!response.ok) {
+        throw new Error(result?.error ?? `Request failed (${response.status})`)
+      }
+      if (!result.hash) {
+        throw new Error(result?.error ?? 'Failed to hash PIN')
+      }
 
       // Save PIN hash
       const { error: updateError } = await supabase
@@ -162,17 +188,27 @@ export function ParentPinEntry() {
 
       if (fetchError || !data?.pin_hash) throw new Error('PIN not found')
 
-      // Verify PIN
+      const { data: { session } } = await supabase.auth.getSession()
+      const token = session?.access_token ?? SUPABASE_ANON_KEY
+
       const response = await fetch(
-        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/verify-pin`,
+        `${SUPABASE_URL}/functions/v1/verify-pin`,
         {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
           body: JSON.stringify({ action: 'verify', pin, hash: data.pin_hash }),
         }
       )
 
-      const result = await response.json()
+      const result = (await response.json()) as { valid?: boolean; error?: string }
+      if (!response.ok) {
+        setError(result?.error ?? `Request failed (${response.status})`)
+        setPin('')
+        return
+      }
       if (!result.valid) {
         setError('Wrong PIN. Try again!')
         setPin('')
@@ -233,12 +269,16 @@ export function ParentPinEntry() {
             <div className="text-center mb-6">
               <div className="text-5xl mb-3">🔐</div>
               <h1 className="text-2xl font-black text-charcoal">
-                {mode === 'set' ? 'Set Your PIN' : mode === 'forgot' ? 'Reset PIN' : 'Enter PIN'}
+                {mode === 'set'
+                  ? 'Hi Parent, please set your PIN.'
+                  : mode === 'forgot'
+                    ? 'Hi Parent, reset your PIN.'
+                    : 'Hi Parent, enter your PIN.'}
               </h1>
               <p className="text-charcoal-light text-sm mt-1">
-                {mode === 'set' 
-                  ? (pin.length === 4 ? 'Confirm your PIN' : 'Create a 4-digit PIN')
-                  : 'Enter your 4-digit parent PIN'}
+                {mode === 'enter'
+                  ? 'Enter your 4-digit PIN to open your dashboard.'
+                  : "You'll use this PIN to open your parent dashboard so only you can manage quests and rewards."}
               </p>
             </div>
 

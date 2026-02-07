@@ -36,6 +36,15 @@ supabase link --project-ref YOUR_PROJECT_REF
 # Go to Supabase Dashboard → SQL Editor → paste supabase/schema.sql
 ```
 
+**Deploy the Parent PIN Edge Function** (required for setting/verifying parent PIN):
+```bash
+# From the repo root (must be linked first)
+supabase functions deploy verify-pin
+```
+- Get `YOUR_PROJECT_REF` from the Supabase dashboard URL: `https://app.supabase.com/project/<project_ref>`.
+- After deploy, the app’s PIN set/verify requests will hit the live function; no extra env vars needed (app uses `VITE_SUPABASE_URL` and anon key).
+- Optional – run the function locally: `supabase functions serve verify-pin` (then point the app at local Functions URL if needed).
+
 ### 2. Vercel Setup
 ```bash
 # Install Vercel CLI
