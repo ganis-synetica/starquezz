@@ -276,11 +276,11 @@ export function ApprovalQueue() {
   }, [count])
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-100 to-purple-100 p-4">
+    <div className="min-h-screen bg-gradient-to-b from-cream to-lavender-light p-4">
       <div className="max-w-xl mx-auto pt-6">
         {/* Header */}
         <div className="flex items-center justify-between mb-4">
-          <h1 className="text-3xl font-black">Parent Dashboard</h1>
+          <h1 className="text-3xl font-black text-charcoal">Parent Dashboard</h1>
           <div className="flex gap-2">
             <Button variant="outline" size="sm" onClick={() => navigate('/')}>Home</Button>
             <Button variant="outline" size="sm" onClick={() => void signOut().then(() => navigate('/'))}>
@@ -294,28 +294,28 @@ export function ApprovalQueue() {
           <Button
             variant={tab === 'approvals' ? 'default' : 'outline'}
             onClick={() => setTab('approvals')}
-            className={tab === 'approvals' ? 'bg-purple-500' : ''}
+            className={tab === 'approvals' ? 'bg-lavender' : ''}
           >
             Approvals {count > 0 && `(${count})`}
           </Button>
           <Button
             variant={tab === 'rewards' ? 'default' : 'outline'}
             onClick={() => setTab('rewards')}
-            className={tab === 'rewards' ? 'bg-purple-500' : ''}
+            className={tab === 'rewards' ? 'bg-lavender' : ''}
           >
             Star Store
           </Button>
           <Button
             variant={tab === 'children' ? 'default' : 'outline'}
             onClick={() => setTab('children')}
-            className={tab === 'children' ? 'bg-purple-500' : ''}
+            className={tab === 'children' ? 'bg-lavender' : ''}
           >
             Children
           </Button>
         </div>
 
         {error && (
-          <div className="mb-4 bg-red-100 border-4 border-black p-3 rounded-xl text-sm font-bold text-red-800">
+          <div className="mb-4 bg-coral-light border-4 border-charcoal p-3 rounded-xl text-sm font-bold text-coral">
             {error}
           </div>
         )}
@@ -323,14 +323,14 @@ export function ApprovalQueue() {
         {/* Approvals Tab */}
         {tab === 'approvals' && (
           <div>
-            <p className="text-lg font-bold text-gray-700 mb-4">{headerText}</p>
+            <p className="text-lg font-bold text-charcoal mb-4">{headerText}</p>
             <div className="space-y-4">
               {rows.map((row) => {
                 const childId = row.habits.child_id
                 const child = childrenById[childId]
                 const isBusy = busyId === row.id
                 return (
-                  <Card key={row.id} className="bg-white">
+                  <Card key={row.id} className="bg-card">
                     <CardContent className="p-4">
                       <div className="flex items-start justify-between gap-3">
                         <div className="flex items-start gap-3">
@@ -338,14 +338,14 @@ export function ApprovalQueue() {
                           <div>
                             <p className="font-black">{child?.name ?? 'Unknown'}</p>
                             <p className="text-lg font-bold">{row.habits.title}</p>
-                            <p className="text-xs text-gray-500">{new Date(row.completed_at).toLocaleString()}</p>
+                            <p className="text-xs text-charcoal-light">{new Date(row.completed_at).toLocaleString()}</p>
                           </div>
                         </div>
                         <div className="flex flex-col gap-2">
-                          <Button size="sm" className="bg-green-400 text-black hover:bg-green-300" disabled={isBusy} onClick={() => void onApprove(row)}>
+                          <Button size="sm" className="bg-sage text-charcoal hover:bg-sage-light" disabled={isBusy} onClick={() => void onApprove(row)}>
                             ✓
                           </Button>
-                          <Button size="sm" className="bg-red-400 text-black hover:bg-red-300" disabled={isBusy} onClick={() => void onReject(row)}>
+                          <Button size="sm" className="bg-coral text-charcoal hover:bg-coral-light" disabled={isBusy} onClick={() => void onReject(row)}>
                             ✗
                           </Button>
                         </div>
@@ -362,14 +362,14 @@ export function ApprovalQueue() {
         {tab === 'rewards' && (
           <div>
             <div className="flex justify-between items-center mb-4">
-              <p className="text-lg font-bold text-gray-700">Manage Star Store Rewards</p>
-              <Button size="sm" onClick={() => setShowAddReward(true)} className="bg-green-400 text-black hover:bg-green-300">
+              <p className="text-lg font-bold text-charcoal">Manage Star Store Rewards</p>
+              <Button size="sm" onClick={() => setShowAddReward(true)} className="bg-sage text-charcoal hover:bg-sage-light">
                 <Plus className="w-4 h-4 mr-1" /> Add
               </Button>
             </div>
 
             {showAddReward && (
-              <Card className="bg-yellow-50 mb-4">
+              <Card className="bg-gold-light mb-4">
                 <CardContent className="p-4">
                   <p className="font-bold mb-2">New Reward</p>
                   <div className="flex gap-2 items-end">
@@ -378,22 +378,22 @@ export function ApprovalQueue() {
                         placeholder="Reward name..."
                         value={newRewardTitle}
                         onChange={(e) => setNewRewardTitle(e.target.value)}
-                        className="border-2 border-black"
+                        className="border-2 border-charcoal"
                       />
                     </div>
                     <div className="w-24">
                       <div className="flex items-center gap-1">
-                        <Star className="w-4 h-4 text-yellow-500" />
+                        <Star className="w-4 h-4 text-gold" />
                         <Input
                           type="number"
                           min={1}
                           value={newRewardCost}
                           onChange={(e) => setNewRewardCost(parseInt(e.target.value) || 1)}
-                          className="border-2 border-black"
+                          className="border-2 border-charcoal"
                         />
                       </div>
                     </div>
-                    <Button size="sm" onClick={addReward} className="bg-green-400 text-black">
+                    <Button size="sm" onClick={addReward} className="bg-sage text-charcoal">
                       <Check className="w-4 h-4" />
                     </Button>
                     <Button size="sm" variant="outline" onClick={() => setShowAddReward(false)}>
@@ -406,26 +406,26 @@ export function ApprovalQueue() {
 
             <div className="space-y-3">
               {rewards.map((reward) => (
-                <Card key={reward.id} className="bg-white">
+                <Card key={reward.id} className="bg-card">
                   <CardContent className="p-4">
                     {editingRewardId === reward.id ? (
                       <div className="flex gap-2 items-center">
                         <Input
                           value={editTitle}
                           onChange={(e) => setEditTitle(e.target.value)}
-                          className="border-2 border-black flex-1"
+                          className="border-2 border-charcoal flex-1"
                         />
                         <div className="w-20 flex items-center gap-1">
-                          <Star className="w-4 h-4 text-yellow-500" />
+                          <Star className="w-4 h-4 text-gold" />
                           <Input
                             type="number"
                             min={1}
                             value={editCost}
                             onChange={(e) => setEditCost(parseInt(e.target.value) || 1)}
-                            className="border-2 border-black"
+                            className="border-2 border-charcoal"
                           />
                         </div>
-                        <Button size="sm" onClick={() => saveReward(reward.id)} className="bg-green-400 text-black">
+                        <Button size="sm" onClick={() => saveReward(reward.id)} className="bg-sage text-charcoal">
                           <Check className="w-4 h-4" />
                         </Button>
                         <Button size="sm" variant="outline" onClick={cancelEditReward}>
@@ -436,8 +436,8 @@ export function ApprovalQueue() {
                       <div className="flex items-center justify-between">
                         <div>
                           <p className="font-bold text-lg">{reward.title}</p>
-                          <div className="flex items-center gap-1 text-yellow-600">
-                            <Star className="w-4 h-4 fill-yellow-400" />
+                          <div className="flex items-center gap-1 text-gold">
+                            <Star className="w-4 h-4 fill-gold" />
                             <span className="font-black">{reward.star_cost}</span>
                           </div>
                         </div>
@@ -445,7 +445,7 @@ export function ApprovalQueue() {
                           <Button size="sm" variant="outline" onClick={() => startEditReward(reward)}>
                             <Pencil className="w-4 h-4" />
                           </Button>
-                          <Button size="sm" variant="outline" className="text-red-500" onClick={() => deleteReward(reward.id)}>
+                          <Button size="sm" variant="outline" className="text-coral" onClick={() => deleteReward(reward.id)}>
                             <Trash2 className="w-4 h-4" />
                           </Button>
                         </div>
@@ -455,7 +455,7 @@ export function ApprovalQueue() {
                 </Card>
               ))}
               {rewards.length === 0 && (
-                <p className="text-center text-gray-500 py-8">No rewards yet. Add some!</p>
+                <p className="text-center text-charcoal-light py-8">No rewards yet. Add some!</p>
               )}
             </div>
           </div>
@@ -465,15 +465,15 @@ export function ApprovalQueue() {
         {tab === 'children' && (
           <div>
             <div className="flex justify-between items-center mb-4">
-              <p className="text-lg font-bold text-gray-700">Manage Children</p>
-              <Button size="sm" onClick={() => navigate('/parent/setup')} className="bg-green-400 text-black hover:bg-green-300">
+              <p className="text-lg font-bold text-charcoal">Manage Children</p>
+              <Button size="sm" onClick={() => navigate('/parent/setup')} className="bg-sage text-charcoal hover:bg-sage-light">
                 <Plus className="w-4 h-4 mr-1" /> Add Child
               </Button>
             </div>
 
             <div className="space-y-3">
               {children.map((child) => (
-                <Card key={child.id} className="bg-white">
+                <Card key={child.id} className="bg-card">
                   <CardContent className="p-4">
                     {editingChildId === child.id ? (
                       <div className="space-y-3">
@@ -481,7 +481,7 @@ export function ApprovalQueue() {
                           value={editChildName}
                           onChange={(e) => setEditChildName(e.target.value)}
                           placeholder="Child name..."
-                          className="border-2 border-black"
+                          className="border-2 border-charcoal"
                         />
                         <div className="grid grid-cols-5 gap-2">
                           {AVATARS.map(emoji => (
@@ -491,8 +491,8 @@ export function ApprovalQueue() {
                               onClick={() => setEditChildAvatar(emoji)}
                               className={`text-2xl p-2 rounded-lg border-2 ${
                                 editChildAvatar === emoji 
-                                  ? 'border-purple-500 bg-purple-100' 
-                                  : 'border-gray-200'
+                                  ? 'border-lavender bg-lavender-light' 
+                                  : 'border-charcoal/20'
                               }`}
                             >
                               {emoji}
@@ -500,7 +500,7 @@ export function ApprovalQueue() {
                           ))}
                         </div>
                         <div className="flex gap-2">
-                          <Button size="sm" onClick={() => saveChild(child.id)} className="bg-green-400 text-black">
+                          <Button size="sm" onClick={() => saveChild(child.id)} className="bg-sage text-charcoal">
                             <Check className="w-4 h-4 mr-1" /> Save
                           </Button>
                           <Button size="sm" variant="outline" onClick={cancelEditChild}>
@@ -514,7 +514,7 @@ export function ApprovalQueue() {
                           <div className="text-3xl">{child.avatar}</div>
                           <div>
                             <p className="font-bold">{child.name}</p>
-                            <p className="text-sm text-gray-500">Current: ⭐ {child.stars || 0}</p>
+                            <p className="text-sm text-charcoal-light">Current: ⭐ {child.stars || 0}</p>
                           </div>
                         </div>
                         <div className="flex gap-2 items-center">
@@ -524,10 +524,10 @@ export function ApprovalQueue() {
                             min={1}
                             value={addStarsAmount}
                             onChange={(e) => setAddStarsAmount(parseInt(e.target.value) || 1)}
-                            className="border-2 border-black w-24"
+                            className="border-2 border-charcoal w-24"
                           />
                           <span>⭐</span>
-                          <Button size="sm" onClick={() => confirmAddStars(child.id)} className="bg-yellow-400 text-black">
+                          <Button size="sm" onClick={() => confirmAddStars(child.id)} className="bg-gold text-charcoal">
                             <Check className="w-4 h-4" />
                           </Button>
                           <Button size="sm" variant="outline" onClick={cancelAddStars}>
@@ -541,15 +541,15 @@ export function ApprovalQueue() {
                           <div className="text-4xl">{child.avatar}</div>
                           <div>
                             <p className="font-bold text-xl">{child.name}</p>
-                            <div className="flex items-center gap-1 text-yellow-600">
-                              <Star className="w-4 h-4 fill-yellow-400" />
+                            <div className="flex items-center gap-1 text-gold">
+                              <Star className="w-4 h-4 fill-gold" />
                               <span className="font-black">{child.stars || 0}</span>
                             </div>
                           </div>
                         </div>
                         <div className="flex gap-2">
                           <Button size="sm" variant="outline" onClick={() => startAddStars(child.id)} title="Add stars">
-                            <Star className="w-4 h-4 text-yellow-500" />
+                            <Star className="w-4 h-4 text-gold" />
                             <Plus className="w-3 h-3" />
                           </Button>
                           <Button size="sm" variant="outline" onClick={() => startEditChild(child)}>
@@ -558,7 +558,7 @@ export function ApprovalQueue() {
                           <Button
                             size="sm"
                             variant="outline"
-                            className="text-red-500"
+                            className="text-coral"
                             onClick={() => deleteChild(child.id, child.name)}
                           >
                             <Trash2 className="w-4 h-4" />
@@ -570,7 +570,7 @@ export function ApprovalQueue() {
                 </Card>
               ))}
               {children.length === 0 && (
-                <p className="text-center text-gray-500 py-8">No children yet.</p>
+                <p className="text-center text-charcoal-light py-8">No children yet.</p>
               )}
             </div>
           </div>

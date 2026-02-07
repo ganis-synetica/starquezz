@@ -10,21 +10,21 @@ const screens = [
     subtitle: 'Make daily tasks feel like exciting adventures',
     image: '/illustrations/onboarding-1-quests.jpg',
     emoji: '⚔️',
-    bgColor: 'from-amber-100 to-orange-100',
+    bgColor: 'from-gold-light to-coral-light',
   },
   {
     title: 'Earn stars for good habits!',
     subtitle: 'Complete quests and watch your stars grow',
     image: '/illustrations/onboarding-2-stars.jpg',
     emoji: '⭐',
-    bgColor: 'from-yellow-100 to-amber-100',
+    bgColor: 'from-gold-light to-coral-light',
   },
   {
     title: 'Redeem for real rewards!',
     subtitle: 'Trade your stars for awesome prizes',
     image: '/illustrations/onboarding-3-rewards.jpg',
     emoji: '🎁',
-    bgColor: 'from-pink-100 to-purple-100',
+    bgColor: 'from-rose-light to-lavender-light',
   },
 ]
 
@@ -60,7 +60,7 @@ export function Onboarding() {
       <div className="flex justify-end">
         <Button
           variant="ghost"
-          className="text-gray-600 font-bold"
+          className="text-charcoal-light font-bold"
           onClick={completeOnboarding}
         >
           Skip
@@ -70,7 +70,7 @@ export function Onboarding() {
       {/* Main content */}
       <div className="flex-1 flex flex-col items-center justify-center max-w-md mx-auto">
         {/* Illustration - 16:9 landscape to match source images (1408×768), no crop */}
-        <div className="w-full max-w-[20rem] aspect-video mb-8 rounded-3xl overflow-hidden bg-white/50 flex items-center justify-center border-4 border-black/10">
+        <div className="w-full max-w-[20rem] aspect-video mb-8 rounded-3xl overflow-hidden bg-white/50 flex items-center justify-center border-4 border-charcoal/10">
           <img
             src={screen.image}
             alt={screen.title}
@@ -85,10 +85,10 @@ export function Onboarding() {
         </div>
 
         {/* Text */}
-        <h1 className="text-3xl font-black text-center mb-3 text-gray-800">
+        <h1 className="text-3xl font-black text-center mb-3 text-charcoal">
           {screen.title}
         </h1>
-        <p className="text-lg text-center text-gray-600 font-medium mb-8">
+        <p className="text-lg text-center text-charcoal-light font-medium mb-8">
           {screen.subtitle}
         </p>
 
@@ -100,8 +100,8 @@ export function Onboarding() {
               onClick={() => setCurrentScreen(index)}
               className={`w-3 h-3 rounded-full transition-all ${
                 index === currentScreen
-                  ? 'bg-purple-500 w-8'
-                  : 'bg-gray-300 hover:bg-gray-400'
+                  ? 'bg-lavender w-8'
+                  : 'bg-charcoal-light hover:bg-charcoal'
               }`}
             />
           ))}
@@ -113,17 +113,17 @@ export function Onboarding() {
         {currentScreen > 0 && (
           <Button
             variant="outline"
-            className="flex-1 border-4 border-black bg-white"
+            className="flex-1 border-4 border-charcoal bg-card"
             onClick={prevScreen}
           >
             Back
           </Button>
         )}
         <Button
-          className={`flex-1 border-4 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] ${
+          className={`flex-1 border-4 border-charcoal shadow-[4px_4px_0px_0px_rgba(74,68,83,0.6)] ${
             isLastScreen
-              ? 'bg-green-400 hover:bg-green-300 text-black'
-              : 'bg-purple-500 hover:bg-purple-400'
+              ? 'bg-sage hover:bg-sage-light text-charcoal'
+              : 'bg-lavender hover:bg-lavender-light'
           }`}
           onClick={nextScreen}
         >

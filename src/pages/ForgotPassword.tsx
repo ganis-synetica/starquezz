@@ -45,20 +45,20 @@ export function ForgotPassword() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-purple-200 to-pink-200 p-6 flex items-center justify-center">
+    <div className="min-h-screen bg-gradient-to-b from-lavender-light to-rose-light p-6 flex items-center justify-center">
       <div className="w-full max-w-md">
-        <Card className="bg-white border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
+        <Card className="bg-card border-4 border-charcoal shadow-[8px_8px_0px_0px_rgba(74,68,83,0.6)]">
           <CardContent className="p-8">
-            <h1 className="text-3xl font-black text-center mb-2">Forgot Password? 🔑</h1>
-            <p className="text-center text-gray-600 mb-6">
+            <h1 className="text-3xl font-black text-center mb-2 text-charcoal">Forgot Password? 🔑</h1>
+            <p className="text-center text-charcoal-light mb-6">
               No worries! Enter your email and we'll send you a reset link.
             </p>
 
             {success ? (
               <div className="text-center">
-                <div className="bg-green-100 border-4 border-black p-4 rounded-xl mb-6">
-                  <p className="text-lg font-bold text-green-800">✅ Check your email!</p>
-                  <p className="text-sm text-green-700 mt-1">
+                <div className="bg-sage-light border-4 border-charcoal p-4 rounded-xl mb-6">
+                  <p className="text-lg font-bold text-sage">✅ Check your email!</p>
+                  <p className="text-sm text-charcoal mt-1">
                     We've sent a password reset link to {email}
                   </p>
                 </div>
@@ -69,26 +69,26 @@ export function ForgotPassword() {
             ) : (
               <form onSubmit={handleSubmit} className="space-y-4">
                 {error && (
-                  <div className="bg-red-100 border-4 border-black p-3 rounded-xl text-sm font-bold text-red-800">
+                  <div className="bg-coral-light border-4 border-charcoal p-3 rounded-xl text-sm font-bold text-coral">
                     {error}
                   </div>
                 )}
 
                 <div>
-                  <label className="block text-sm font-bold mb-1">Email</label>
+                  <label className="block text-sm font-bold mb-1 text-charcoal">Email</label>
                   <Input
                     type="email"
                     placeholder="parent@example.com"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="border-4 border-black"
+                    className="border-4 border-charcoal"
                     required
                   />
                 </div>
 
                 <Button
                   type="submit"
-                  className="w-full bg-purple-500 hover:bg-purple-400"
+                  className="w-full bg-lavender hover:bg-lavender-light"
                   disabled={loading}
                 >
                   {loading ? 'Sending...' : 'Send Reset Link'}

@@ -59,48 +59,48 @@ export function HomePage() {
   }, [status, user, navigate])
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-yellow-200 to-orange-200 p-6">
+    <div className="min-h-screen bg-gradient-to-b from-cream to-coral-light p-6">
       <div className="max-w-md mx-auto">
         {/* Header */}
         <div className="text-center mb-8 pt-8">
           <div className="text-6xl mb-4">⭐</div>
-          <h1 className="text-4xl font-black text-black mb-2">
+          <h1 className="text-4xl font-black text-charcoal mb-2">
             StarqueZZ
           </h1>
-          <p className="text-lg font-bold text-gray-700">
+          <p className="text-lg font-bold text-charcoal">
             Time for your daily quest-astic adventure! 🚀
           </p>
         </div>
 
         {/* Kid Profiles */}
         <div className="space-y-4 mb-8">
-          <h2 className="text-xl font-bold text-center">Who's ready to quest?</h2>
-          {error && <p className="text-sm font-bold text-red-700 text-center">{error}</p>}
+          <h2 className="text-xl font-bold text-center text-charcoal">Who's ready to quest?</h2>
+          {error && <p className="text-sm font-bold text-coral text-center">{error}</p>}
           {loading && status === 'authenticated' && (
-            <p className="text-sm font-bold text-gray-700 text-center">Loading...</p>
+            <p className="text-sm font-bold text-charcoal text-center">Loading...</p>
           )}
           {!loading && status !== 'authenticated' && (
-            <p className="text-sm font-bold text-gray-700 text-center">
+            <p className="text-sm font-bold text-charcoal text-center">
               Parents: log in to get started.
             </p>
           )}
           {kids.map((kid) => (
             <Card 
               key={kid.id} 
-              className="cursor-pointer hover:translate-x-1 hover:translate-y-1 hover:shadow-none transition-all bg-white"
+              className="cursor-pointer hover:translate-x-1 hover:translate-y-1 hover:shadow-none transition-all bg-card"
               onClick={() => navigate(`/child/${kid.id}`)}
             >
               <CardContent className="p-4">
                 <div className="flex items-center gap-4">
                   <div className="text-5xl">{kid.avatar}</div>
                   <div className="flex-1">
-                    <h3 className="text-2xl font-black">{kid.name}</h3>
-                    <div className="flex items-center gap-1 text-lg font-bold text-yellow-600">
-                      <Star className="w-5 h-5 fill-yellow-400 text-yellow-600" />
+                    <h3 className="text-2xl font-black text-charcoal">{kid.name}</h3>
+                    <div className="flex items-center gap-1 text-lg font-bold text-gold">
+                      <Star className="w-5 h-5 fill-gold text-gold" />
                       {kid.stars} stars
                     </div>
                   </div>
-                  <Sparkles className="w-8 h-8 text-purple-500" />
+                  <Sparkles className="w-8 h-8 text-lavender" />
                 </div>
               </CardContent>
             </Card>
@@ -110,18 +110,18 @@ export function HomePage() {
         {/* Parent Login */}
         <div className="text-center">
           {status === 'authenticated' ? (
-            <Button variant="outline" className="bg-white" onClick={() => navigate('/parent/pin')}>
+            <Button variant="outline" className="bg-card" onClick={() => navigate('/parent/pin')}>
               👨‍👩‍👧‍👦 Parent Dashboard
             </Button>
           ) : (
-            <Button variant="outline" className="bg-white" onClick={() => navigate('/login')}>
+            <Button variant="outline" className="bg-card" onClick={() => navigate('/login')}>
               👨‍👩‍👧‍👦 Parent Login
             </Button>
           )}
         </div>
 
         {/* Fun footer */}
-        <p className="text-center text-sm font-bold text-gray-600 mt-8">
+        <p className="text-center text-sm font-bold text-charcoal-light mt-8">
           Psst... complete your quests and earn stars! ✨
         </p>
       </div>

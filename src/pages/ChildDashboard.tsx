@@ -88,7 +88,7 @@ export function ChildDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-purple-200 to-pink-200 p-4">
+    <div className="min-h-screen bg-gradient-to-b from-lavender-light to-rose-light p-4">
       <div className="max-w-md mx-auto">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
@@ -96,40 +96,40 @@ export function ChildDashboard() {
             >
             <ArrowLeft className="w-6 h-6" />
           </Button>
-          <div className="flex items-center gap-2 bg-yellow-300 px-4 py-2 rounded-full border-4 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-            <Star className="w-6 h-6 fill-yellow-500 text-yellow-700" />
-            <span className="text-xl font-black">{child?.stars ?? 0}</span>
+          <div className="flex items-center gap-2 bg-gold-light px-4 py-2 rounded-full border-4 border-charcoal shadow-[4px_4px_0px_0px_rgba(74,68,83,0.6)]">
+            <Star className="w-6 h-6 fill-gold text-charcoal" />
+            <span className="text-xl font-black text-charcoal">{child?.stars ?? 0}</span>
           </div>
         </div>
 
         {/* Greeting */}
         <div className="text-center mb-6">
-          <h1 className="text-3xl font-black mb-1">Hey {child?.name ?? 'Explorer'}! {child?.avatar ?? '⭐'}</h1>
-          <p className="text-lg font-bold text-gray-700">
+          <h1 className="text-3xl font-black mb-1 text-charcoal">Hey {child?.name ?? 'Explorer'}! {child?.avatar ?? '⭐'}</h1>
+          <p className="text-lg font-bold text-charcoal">
             Ready to quest-ify your day?
           </p>
         </div>
 
         {error && (
-          <div className="mb-4 bg-red-100 border-4 border-black p-3 rounded-xl text-sm font-bold text-red-800">
+          <div className="mb-4 bg-coral-light border-4 border-charcoal p-3 rounded-xl text-sm font-bold text-coral">
             {error}
           </div>
         )}
 
         {/* Core Progress */}
-        <Card className="mb-6 bg-white">
+        <Card className="mb-6 bg-card">
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-bold text-gray-500">DAILY QUESTS</p>
-                <p className="text-2xl font-black">
+                <p className="text-sm font-bold text-charcoal-light">DAILY QUESTS</p>
+                <p className="text-2xl font-black text-charcoal">
                   {coreCompleted}/{totalCore} Core Done
                 </p>
               </div>
-              <Trophy className={`w-12 h-12 ${coreCompleted === totalCore ? 'text-yellow-500' : 'text-gray-300'}`} />
+              <Trophy className={`w-12 h-12 ${coreCompleted === totalCore ? 'text-gold' : 'text-charcoal-light'}`} />
             </div>
             {coreCompleted === totalCore && (
-              <p className="text-sm font-bold text-green-600 mt-2">
+              <p className="text-sm font-bold text-sage mt-2">
                 🎉 You've earned today's star! Quest-master extraordinaire!
               </p>
             )}
@@ -137,28 +137,28 @@ export function ChildDashboard() {
         </Card>
 
         {/* Core Habits */}
-        <h2 className="text-lg font-black mb-3 flex items-center gap-2">
+        <h2 className="text-lg font-black mb-3 flex items-center gap-2 text-charcoal">
           ⚡ Must-Do Quests
         </h2>
         <div className="space-y-3 mb-6">
           {habits.filter(h => h.is_core).map((habit) => (
             <Card 
               key={habit.id} 
-              className={`cursor-pointer transition-all ${habit.completed ? 'bg-green-100' : 'bg-white'}`}
+              className={`cursor-pointer transition-all ${habit.completed ? 'bg-sage-light' : 'bg-card'}`}
               onClick={() => completeHabit(habit)}
             >
               <CardContent className="p-4">
                 <div className="flex items-center gap-3">
-                  <div className={`w-8 h-8 rounded-lg border-4 border-black flex items-center justify-center ${habit.completed ? 'bg-green-400' : 'bg-white'}`}>
-                    {habit.completed && <Check className="w-5 h-5 text-black" />}
+                  <div className={`w-8 h-8 rounded-lg border-4 border-charcoal flex items-center justify-center ${habit.completed ? 'bg-sage' : 'bg-card'}`}>
+                    {habit.completed && <Check className="w-5 h-5 text-charcoal" />}
                   </div>
                   <div className="flex-1">
-                    <h3 className={`text-lg font-bold ${habit.completed ? 'line-through opacity-60' : ''}`}>
+                    <h3 className={`text-lg font-bold text-charcoal ${habit.completed ? 'line-through opacity-60' : ''}`}>
                       {habit.title}
                     </h3>
-                    <p className="text-sm text-gray-600">{habit.description}</p>
+                    <p className="text-sm text-charcoal-light">{habit.description}</p>
                     {habit.pending && (
-                      <p className="text-xs font-bold text-purple-700 mt-1">Pending approval ⏳</p>
+                      <p className="text-xs font-bold text-lavender mt-1">Pending approval ⏳</p>
                     )}
                   </div>
                 </div>
@@ -168,29 +168,29 @@ export function ChildDashboard() {
         </div>
 
         {/* Extra Habits */}
-        <h2 className="text-lg font-black mb-3 flex items-center gap-2">
+        <h2 className="text-lg font-black mb-3 flex items-center gap-2 text-charcoal">
           🌟 Bonus Quests
-          <span className="text-sm font-normal text-gray-500">(+1 star each!)</span>
+          <span className="text-sm font-normal text-charcoal-light">(+1 star each!)</span>
         </h2>
         <div className="space-y-3 mb-6">
           {habits.filter(h => !h.is_core).map((habit) => (
             <Card 
               key={habit.id} 
-              className={`cursor-pointer transition-all ${habit.completed ? 'bg-green-100' : 'bg-white'} ${coreCompleted < totalCore ? 'opacity-50' : ''}`}
+              className={`cursor-pointer transition-all ${habit.completed ? 'bg-sage-light' : 'bg-card'} ${coreCompleted < totalCore ? 'opacity-50' : ''}`}
               onClick={() => completeHabit(habit)}
             >
               <CardContent className="p-4">
                 <div className="flex items-center gap-3">
-                  <div className={`w-8 h-8 rounded-lg border-4 border-black flex items-center justify-center ${habit.completed ? 'bg-green-400' : 'bg-white'}`}>
-                    {habit.completed ? <Check className="w-5 h-5 text-black" /> : <Clock className="w-4 h-4 text-gray-400" />}
+                  <div className={`w-8 h-8 rounded-lg border-4 border-charcoal flex items-center justify-center ${habit.completed ? 'bg-sage' : 'bg-card'}`}>
+                    {habit.completed ? <Check className="w-5 h-5 text-charcoal" /> : <Clock className="w-4 h-4 text-charcoal-light" />}
                   </div>
                   <div className="flex-1">
-                    <h3 className={`text-lg font-bold ${habit.completed ? 'line-through opacity-60' : ''}`}>
+                    <h3 className={`text-lg font-bold text-charcoal ${habit.completed ? 'line-through opacity-60' : ''}`}>
                       {habit.title}
                     </h3>
-                    <p className="text-sm text-gray-600">{habit.description}</p>
+                    <p className="text-sm text-charcoal-light">{habit.description}</p>
                     {habit.pending && (
-                      <p className="text-xs font-bold text-purple-700 mt-1">Pending approval ⏳</p>
+                      <p className="text-xs font-bold text-lavender mt-1">Pending approval ⏳</p>
                     )}
                   </div>
                 </div>
@@ -198,14 +198,14 @@ export function ChildDashboard() {
             </Card>
           ))}
           {coreCompleted < totalCore && (
-            <p className="text-center text-sm font-bold text-gray-500">
+            <p className="text-center text-sm font-bold text-charcoal-light">
               Complete your must-do quests first! 🔒
             </p>
           )}
         </div>
 
         {/* Star Store Button */}
-        <Button className="w-full bg-yellow-400 text-black hover:bg-yellow-300" size="lg" onClick={() => navigate(`/store/${childId}`)}>
+        <Button className="w-full bg-gold text-charcoal hover:bg-gold-light" size="lg" onClick={() => navigate(`/store/${childId}`)}>
           🛒 Star Store
         </Button>
 

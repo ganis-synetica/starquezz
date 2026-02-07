@@ -219,23 +219,23 @@ export function ParentPinEntry() {
 
   if (hasPin === null) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-slate-100 to-purple-100 flex items-center justify-center">
-        <p className="text-lg font-bold">Loading...</p>
+      <div className="min-h-screen bg-gradient-to-b from-cream to-lavender-light flex items-center justify-center">
+        <p className="text-lg font-bold text-charcoal">Loading...</p>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-100 to-purple-100 p-6">
+    <div className="min-h-screen bg-gradient-to-b from-cream to-lavender-light p-6">
       <div className="max-w-sm mx-auto pt-20">
-        <Card className="bg-white border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
+        <Card className="bg-card border-4 border-charcoal shadow-[8px_8px_0px_0px_rgba(74,68,83,0.6)]">
           <CardContent className="p-6">
             <div className="text-center mb-6">
               <div className="text-5xl mb-3">🔐</div>
-              <h1 className="text-2xl font-black">
+              <h1 className="text-2xl font-black text-charcoal">
                 {mode === 'set' ? 'Set Your PIN' : mode === 'forgot' ? 'Reset PIN' : 'Enter PIN'}
               </h1>
-              <p className="text-gray-600 text-sm mt-1">
+              <p className="text-charcoal-light text-sm mt-1">
                 {mode === 'set' 
                   ? (pin.length === 4 ? 'Confirm your PIN' : 'Create a 4-digit PIN')
                   : 'Enter your 4-digit parent PIN'}
@@ -243,7 +243,7 @@ export function ParentPinEntry() {
             </div>
 
             {error && (
-              <div className="mb-4 bg-red-100 border-2 border-red-300 p-2 rounded-lg text-sm font-bold text-red-700 text-center">
+              <div className="mb-4 bg-coral-light border-2 border-coral p-2 rounded-lg text-sm font-bold text-coral text-center">
                 {error}
               </div>
             )}
@@ -255,8 +255,8 @@ export function ParentPinEntry() {
                 return (
                   <div
                     key={i}
-                    className={`w-4 h-4 rounded-full border-4 border-black ${
-                      i < currentPin.length ? 'bg-purple-500' : 'bg-white'
+                    className={`w-4 h-4 rounded-full border-4 border-charcoal ${
+                      i < currentPin.length ? 'bg-lavender' : 'bg-card'
                     }`}
                   />
                 )
@@ -264,7 +264,7 @@ export function ParentPinEntry() {
             </div>
 
             {mode === 'set' && pin.length === 4 && (
-              <p className="text-center text-sm text-gray-500 mb-4">Confirm your PIN</p>
+              <p className="text-center text-sm text-charcoal-light mb-4">Confirm your PIN</p>
             )}
 
             {/* Number pad */}
@@ -288,7 +288,7 @@ export function ParentPinEntry() {
             {/* Action buttons */}
             {mode === 'set' && pin.length === 4 && confirmPin.length === 4 && (
               <Button 
-                className="w-full bg-green-400 text-black hover:bg-green-300 font-bold"
+                className="w-full bg-sage text-charcoal hover:bg-sage-light font-bold"
                 onClick={handleSetPin}
                 disabled={loading}
               >
@@ -298,7 +298,7 @@ export function ParentPinEntry() {
 
             {mode === 'enter' && pin.length === 4 && (
               <Button 
-                className="w-full bg-purple-500 hover:bg-purple-400 font-bold"
+                className="w-full bg-lavender hover:bg-lavender-light font-bold"
                 onClick={handleVerifyPin}
                 disabled={loading}
               >

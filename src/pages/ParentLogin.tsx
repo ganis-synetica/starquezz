@@ -45,27 +45,27 @@ export function ParentLogin() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-purple-200 to-pink-200 p-6">
+    <div className="min-h-screen bg-gradient-to-b from-lavender-light to-rose-light p-6">
       <div className="max-w-md mx-auto pt-10">
         <div className="text-center mb-6">
-          <h1 className="text-4xl font-black">Parent Portal</h1>
-          <p className="text-lg font-bold text-gray-700">Log in to manage quests and rewards.</p>
+          <h1 className="text-4xl font-black text-charcoal">Parent Portal</h1>
+          <p className="text-lg font-bold text-charcoal">Log in to manage quests and rewards.</p>
         </div>
 
-        <Card className="bg-white">
+        <Card className="bg-card">
           <CardContent className="p-6">
             <form onSubmit={onSubmit} className="space-y-4">
               <div>
-                <label className="text-sm font-black">Email</label>
+                <label className="text-sm font-black text-charcoal">Email</label>
                 <Input value={email} onChange={(e) => setEmail(e.target.value)} type="email" placeholder="you@example.com" />
               </div>
               <div>
-                <label className="text-sm font-black">Password</label>
+                <label className="text-sm font-black text-charcoal">Password</label>
                 <Input value={password} onChange={(e) => setPassword(e.target.value)} type="password" placeholder="••••••••" />
               </div>
 
               {error && (
-                <div className="bg-red-100 border-4 border-black p-3 rounded-xl text-sm font-bold text-red-800">
+                <div className="bg-coral-light border-4 border-charcoal p-3 rounded-xl text-sm font-bold text-coral">
                   {error}
                 </div>
               )}

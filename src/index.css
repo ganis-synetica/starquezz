@@ -1,23 +1,39 @@
 @import "tailwindcss";
 
+@theme {
+  --color-cream: #FAF8F4;
+  --color-lavender: #B5A3C9;
+  --color-lavender-light: #D8CEE6;
+  --color-sage: #A8D4C4;
+  --color-sage-light: #D4EDE4;
+  --color-coral: #E8A99A;
+  --color-coral-light: #F5DDD6;
+  --color-gold: #C9AD6A;
+  --color-gold-light: #EDE3C6;
+  --color-rose: #DBA5BC;
+  --color-rose-light: #F0D5E2;
+  --color-charcoal: #4A4453;
+  --color-charcoal-light: #7A7484;
+}
+
 :root {
-  --background: oklch(1.0000 0 0);
-  --foreground: oklch(0 0 0);
-  --card: oklch(1.0000 0 0);
-  --card-foreground: oklch(0 0 0);
-  --primary: oklch(0.6489 0.2370 26.9728);
-  --primary-foreground: oklch(1.0000 0 0);
-  --secondary: oklch(0.9680 0.2110 109.7692);
-  --secondary-foreground: oklch(0 0 0);
-  --muted: oklch(0.9551 0 0);
-  --muted-foreground: oklch(0.3211 0 0);
-  --accent: oklch(0.5635 0.2408 260.8178);
-  --accent-foreground: oklch(1.0000 0 0);
-  --destructive: oklch(0.5 0.2 25);
-  --destructive-foreground: oklch(1.0000 0 0);
-  --border: oklch(0 0 0);
-  --input: oklch(0 0 0);
-  --ring: oklch(0.6489 0.2370 26.9728);
+  --background: #FAF8F4;
+  --foreground: #4A4453;
+  --card: #FFFFFF;
+  --card-foreground: #4A4453;
+  --primary: #B5A3C9;
+  --primary-foreground: #FFFFFF;
+  --secondary: #C9AD6A;
+  --secondary-foreground: #4A4453;
+  --muted: #F0EDE8;
+  --muted-foreground: #7A7484;
+  --accent: #E8A99A;
+  --accent-foreground: #4A4453;
+  --destructive: #D98A8A;
+  --destructive-foreground: #FFFFFF;
+  --border: #4A4453;
+  --input: #4A4453;
+  --ring: #B5A3C9;
   --radius: 0px;
 }
 

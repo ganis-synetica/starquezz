@@ -48,26 +48,26 @@ export function ParentSignUp() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-yellow-200 to-orange-200 p-6">
+    <div className="min-h-screen bg-gradient-to-b from-cream to-coral-light p-6">
       <div className="max-w-md mx-auto pt-10">
         <div className="text-center mb-6">
-          <h1 className="text-4xl font-black">Create Parent Account</h1>
-          <p className="text-lg font-bold text-gray-700">Let’s set up your quest HQ.</p>
+          <h1 className="text-4xl font-black text-charcoal">Create Parent Account</h1>
+          <p className="text-lg font-bold text-charcoal">Let’s set up your quest HQ.</p>
         </div>
 
-        <Card className="bg-white">
+        <Card className="bg-card">
           <CardContent className="p-6">
             <form onSubmit={onSubmit} className="space-y-4">
               <div>
-                <label className="text-sm font-black">Email</label>
+                <label className="text-sm font-black text-charcoal">Email</label>
                 <Input value={email} onChange={(e) => setEmail(e.target.value)} type="email" placeholder="you@example.com" />
               </div>
               <div>
-                <label className="text-sm font-black">Password</label>
+                <label className="text-sm font-black text-charcoal">Password</label>
                 <Input value={password} onChange={(e) => setPassword(e.target.value)} type="password" placeholder="At least 8 characters" />
               </div>
               <div>
-                <label className="text-sm font-black">Confirm Password</label>
+                <label className="text-sm font-black text-charcoal">Confirm Password</label>
                 <Input
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
@@ -77,7 +77,7 @@ export function ParentSignUp() {
               </div>
 
               {error && (
-                <div className="bg-red-100 border-4 border-black p-3 rounded-xl text-sm font-bold text-red-800">
+                <div className="bg-coral-light border-4 border-charcoal p-3 rounded-xl text-sm font-bold text-coral">
                   {error}
                 </div>
               )}

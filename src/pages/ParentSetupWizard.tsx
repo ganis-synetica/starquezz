@@ -183,12 +183,12 @@ export function ParentSetupWizard() {
           <div className="text-center">
             <div className="text-8xl mb-6">🌟</div>
             <h1 className="text-4xl font-black mb-4">Welcome to StarqueZZ!</h1>
-            <p className="text-xl text-gray-600 mb-8">
+            <p className="text-xl text-charcoal-light mb-8">
               Let's set up your family in just a few steps
             </p>
             <Button 
               size="lg" 
-              className="bg-purple-500 hover:bg-purple-400 text-xl px-8 py-6"
+              className="bg-lavender hover:bg-lavender-light text-xl px-8 py-6"
               onClick={() => setStep('child')}
             >
               Get Started 🚀
@@ -200,7 +200,7 @@ export function ParentSetupWizard() {
         return (
           <div>
             <h1 className="text-3xl font-black mb-2 text-center">Add a Child</h1>
-            <p className="text-gray-600 mb-6 text-center">Who will be questing today?</p>
+            <p className="text-charcoal-light mb-6 text-center">Who will be questing today?</p>
 
             <div className="mb-6">
               <label className="block text-sm font-bold mb-2">Child's Name</label>
@@ -208,7 +208,7 @@ export function ParentSetupWizard() {
                 placeholder="Enter name..."
                 value={currentChild.name}
                 onChange={(e) => setCurrentChild({ ...currentChild, name: e.target.value })}
-                className="border-4 border-black text-xl p-4"
+                className="border-4 border-charcoal text-xl p-4"
               />
             </div>
 
@@ -222,8 +222,8 @@ export function ParentSetupWizard() {
                     onClick={() => setCurrentChild({ ...currentChild, avatar: emoji })}
                     className={`text-4xl p-3 rounded-xl border-4 transition-all ${
                       currentChild.avatar === emoji 
-                        ? 'border-purple-500 bg-purple-100 scale-110' 
-                        : 'border-gray-200 hover:border-gray-400'
+                        ? 'border-lavender bg-lavender-light scale-110' 
+                        : 'border-charcoal/20 hover:border-charcoal'
                     }`}
                   >
                     {emoji}
@@ -233,7 +233,7 @@ export function ParentSetupWizard() {
             </div>
 
             <Button 
-              className="w-full bg-green-400 text-black hover:bg-green-300 text-lg"
+              className="w-full bg-sage text-charcoal hover:bg-sage-light text-lg"
               onClick={addChild}
             >
               Add {currentChild.name || 'Child'} {currentChild.avatar}
@@ -245,21 +245,21 @@ export function ParentSetupWizard() {
         return (
           <div>
             <h1 className="text-3xl font-black mb-2 text-center">Daily Quests</h1>
-            <p className="text-gray-600 mb-6 text-center">
+            <p className="text-charcoal-light mb-6 text-center">
               What should {children[children.length - 1]?.name} do each day?
             </p>
 
             <div className="space-y-3 mb-6 max-h-[50vh] overflow-y-auto">
               {habits.map(habit => (
-                <Card key={habit.id} className="bg-white">
+                <Card key={habit.id} className="bg-card">
                   <CardContent className="p-3 flex items-center gap-3">
                     <button
                       type="button"
                       onClick={() => toggleHabitCore(habit.id)}
                       className={`px-2 py-1 text-xs font-bold rounded ${
                         habit.is_core 
-                          ? 'bg-purple-500 text-white' 
-                          : 'bg-gray-200 text-gray-600'
+                          ? 'bg-lavender text-white' 
+                          : 'bg-muted text-charcoal-light'
                       }`}
                     >
                       {habit.is_core ? 'CORE' : 'BONUS'}
@@ -268,7 +268,7 @@ export function ParentSetupWizard() {
                     <button
                       type="button"
                       onClick={() => removeHabit(habit.id)}
-                      className="text-red-500 font-bold"
+                      className="text-coral font-bold"
                     >
                       ✕
                     </button>
@@ -282,21 +282,21 @@ export function ParentSetupWizard() {
                 placeholder="Add custom habit..."
                 value={newHabitTitle}
                 onChange={(e) => setNewHabitTitle(e.target.value)}
-                className="border-2 border-black"
+                className="border-2 border-charcoal"
                 onKeyDown={(e) => e.key === 'Enter' && addHabit()}
               />
               <Button onClick={addHabit}>Add</Button>
             </div>
 
             <Button 
-              className="w-full bg-purple-500 hover:bg-purple-400 text-lg"
+              className="w-full bg-lavender hover:bg-lavender-light text-lg"
               onClick={() => setStep('rewards')}
               disabled={habits.length < 2}
             >
               Next: Rewards →
             </Button>
             {habits.length < 2 && (
-              <p className="text-center text-sm text-red-500 mt-2">Add at least 2 habits</p>
+              <p className="text-center text-sm text-coral mt-2">Add at least 2 habits</p>
             )}
           </div>
         )
@@ -305,20 +305,20 @@ export function ParentSetupWizard() {
         return (
           <div>
             <h1 className="text-3xl font-black mb-2 text-center">Star Store</h1>
-            <p className="text-gray-600 mb-6 text-center">
+            <p className="text-charcoal-light mb-6 text-center">
               What can {children[children.length - 1]?.name} earn?
             </p>
 
             <div className="space-y-3 mb-6">
               {rewards.map(reward => (
-                <Card key={reward.id} className="bg-white">
+                <Card key={reward.id} className="bg-card">
                   <CardContent className="p-3 flex items-center gap-3">
                     <span className="flex-1 font-bold">{reward.title}</span>
-                    <span className="font-black text-yellow-600">⭐ {reward.star_cost}</span>
+                    <span className="font-black text-gold">⭐ {reward.star_cost}</span>
                     <button
                       type="button"
                       onClick={() => removeReward(reward.id)}
-                      className="text-red-500 font-bold"
+                      className="text-coral font-bold"
                     >
                       ✕
                     </button>
@@ -332,20 +332,20 @@ export function ParentSetupWizard() {
                 placeholder="Reward name..."
                 value={newRewardTitle}
                 onChange={(e) => setNewRewardTitle(e.target.value)}
-                className="border-2 border-black flex-1"
+                className="border-2 border-charcoal flex-1"
               />
               <Input
                 type="number"
                 min={1}
                 value={newRewardCost}
                 onChange={(e) => setNewRewardCost(parseInt(e.target.value) || 1)}
-                className="border-2 border-black w-20"
+                className="border-2 border-charcoal w-20"
               />
               <Button onClick={addReward}>Add</Button>
             </div>
 
             <Button 
-              className="w-full bg-purple-500 hover:bg-purple-400 text-lg"
+              className="w-full bg-lavender hover:bg-lavender-light text-lg"
               onClick={() => setStep('summary')}
               disabled={rewards.length < 1}
             >
@@ -360,7 +360,7 @@ export function ParentSetupWizard() {
             <div className="text-6xl mb-4">🎉</div>
             <h1 className="text-3xl font-black mb-4">You're All Set!</h1>
             
-            <Card className="bg-white mb-6">
+            <Card className="bg-card mb-6">
               <CardContent className="p-4">
                 <div className="space-y-3">
                   <div className="flex justify-between">
@@ -380,7 +380,7 @@ export function ParentSetupWizard() {
             </Card>
 
             {error && (
-              <div className="bg-red-100 border-4 border-black p-3 rounded-xl text-sm font-bold text-red-800 mb-4">
+              <div className="bg-coral-light border-4 border-charcoal p-3 rounded-xl text-sm font-bold text-coral mb-4">
                 {error}
               </div>
             )}
@@ -394,7 +394,7 @@ export function ParentSetupWizard() {
                 + Add Another Child
               </Button>
               <Button 
-                className="w-full bg-green-400 text-black hover:bg-green-300 text-lg"
+                className="w-full bg-sage text-charcoal hover:bg-sage-light text-lg"
                 onClick={saveAndFinish}
                 disabled={saving}
               >
@@ -410,7 +410,7 @@ export function ParentSetupWizard() {
   const currentIndex = steps.indexOf(step)
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-purple-100 to-pink-100 p-6">
+    <div className="min-h-screen bg-gradient-to-b from-lavender-light to-rose-light p-6">
       <div className="max-w-md mx-auto">
         {/* Progress dots */}
         {step !== 'welcome' && (
@@ -419,8 +419,8 @@ export function ParentSetupWizard() {
               <div
                 key={s}
                 className={`w-3 h-3 rounded-full transition-all ${
-                  i < currentIndex ? 'bg-purple-500' : 
-                  i === currentIndex - 1 ? 'bg-purple-500 w-8' : 'bg-gray-300'
+                  i < currentIndex ? 'bg-lavender' : 
+                  i === currentIndex - 1 ? 'bg-lavender w-8' : 'bg-charcoal-light'
                 }`}
               />
             ))}
@@ -441,7 +441,7 @@ export function ParentSetupWizard() {
           </Button>
         )}
 
-        <Card className="bg-white/80 backdrop-blur border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
+        <Card className="bg-card/80 backdrop-blur border-4 border-charcoal shadow-[8px_8px_0px_0px_rgba(74,68,83,0.6)]">
           <CardContent className="p-6">
             {renderStep()}
           </CardContent>
