@@ -35,14 +35,13 @@ function saveAttempts(childId: string, next: AttemptState) {
   localStorage.setItem(storageKey(childId), JSON.stringify(next))
 }
 
-async function verifyPin(pin: string, hash: string) {
-  const encoder = new TextEncoder()
-  const data = encoder.encode(`${pin}:${hash}`)
-  const digest = await crypto.subtle.digest('SHA-256', data)
-  const hex = Array.from(new Uint8Array(digest))
-    .map((b) => b.toString(16).padStart(2, '0'))
-    .join('')
-  return hex === hash
+async function verifyPinWithEdge(childId: string, pin: string) {
+  const { data, error } = await supabase.functions.invoke('verify-pin', {
+    body: { child_id: childId, pin },
+  })
+
+  if (error) throw error
+  return Boolean((data as { success?: boolean } | null)?.success)
 }
 
 export function PinEntry() {
@@ -54,7 +53,7 @@ export function PinEntry() {
   const [pin, setPin] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [shake, setShake] = useState(false)
-  const [child, setChild] = useState<Pick<Child, 'id' | 'name' | 'avatar' | 'pin_hash'> | null>(null)
+  const [child, setChild] = useState<Pick<Child, 'id' | 'name' | 'avatar'> | null>(null)
 
   const [attempts, setAttempts] = useState<AttemptState>(() => (childId ? loadAttempts(childId) : { count: 0, lockedUntil: null }))
 
@@ -73,7 +72,7 @@ export function PinEntry() {
     void (async () => {
       const { data, error: fetchError } = await supabase
         .from('children')
-        .select('id,name,avatar,pin_hash')
+        .select('id,name,avatar')
         .eq('id', childId)
         .maybeSingle()
 
@@ -114,7 +113,14 @@ export function PinEntry() {
       return
     }
 
-    const ok = await verifyPin(pin, child.pin_hash)
+    let ok = false
+    try {
+      ok = await verifyPinWithEdge(childId, pin)
+    } catch {
+      setError('PIN check failed. Try again!')
+      return
+    }
+
     if (ok) {
       saveAttempts(childId, { count: 0, lockedUntil: null })
       loginChild(childId)
@@ -208,4 +214,3 @@ export function PinEntry() {
     </div>
   )
 }
-
