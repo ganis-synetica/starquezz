@@ -72,6 +72,18 @@ export function KidsSetupStep({ kidIndex, totalKids, kid, onChange, onNext, onBa
         </div>
       </div>
 
+      <div>
+        <label className="block text-sm font-bold mb-2 text-charcoal-light">
+          Anything else we should know about {kid.name || 'them'}? <span className="text-charcoal/50">(optional)</span>
+        </label>
+        <textarea
+          value={kid.notes}
+          onChange={(event) => onChange({ ...kid, notes: event.target.value })}
+          placeholder="Interests, struggles, talents, personality... Help Musang craft the perfect quests!"
+          className="w-full min-h-[80px] border-4 border-charcoal rounded-md p-3 text-base font-bold text-charcoal resize-none bg-white shadow-[4px_4px_0px_0px_rgba(74,68,83,0.6)] focus:outline-none focus:ring-2 focus:ring-lavender placeholder:text-charcoal/40"
+        />
+      </div>
+
       <div className="flex gap-3 pt-2">
         {onBack && (
           <Button variant="outline" className="flex-1" onClick={onBack}>

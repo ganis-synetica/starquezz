@@ -1,6 +1,6 @@
 import { useAuth } from '@/contexts/AuthContext'
 import { supabase } from '@/lib/supabase'
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
@@ -34,7 +34,7 @@ const STORE_STEPS: Array<OnboardingStep & { stage: 'store' }> = [
 ]
 
 const defaultStorePlan = (): StorePlan => ({
-  currency: 'IDR',
+  currency: '',
   customCurrency: '',
   budget: 150_000,
   motivators: [],
@@ -72,11 +72,16 @@ function loadWizardState() {
 }
 
 function createKidDraft(index: number): KidProfile {
+  const randomId =
+    typeof crypto !== 'undefined' && 'randomUUID' in crypto
+      ? crypto.randomUUID()
+      : `${Date.now()}-${Math.random().toString(36).slice(2, 7)}`
   return {
-    id: `kid-${index}-${crypto.randomUUID?.() ?? Date.now()}`,
+    id: `kid-${index}-${randomId}`,
     name: '',
     age: null,
     avatar: AVATARS[index % AVATARS.length],
+    notes: '',
     focusAreas: [],
     habits: { core: [], bonus: [] },
   }
@@ -103,6 +108,18 @@ export function OnboardingWizard() {
   const [rewardError, setRewardError] = useState<string | null>(null)
   const [saving, setSaving] = useState(false)
   const [saveError, setSaveError] = useState<string | null>(null)
+
+  useEffect(() => {
+    if (!kidCount) return
+    if (kids.length >= kidCount) return
+    setKids((prev) => {
+      const next = [...prev]
+      while (next.length < kidCount) {
+        next.push(createKidDraft(next.length))
+      }
+      return next
+    })
+  }, [kidCount, kids.length])
 
   useEffect(() => {
     if (typeof window === 'undefined') return
@@ -211,8 +228,7 @@ export function OnboardingWizard() {
     )
   }
 
-  const runHabitGeneration = async (kidIndex: number) => {
-    const kid = kids[kidIndex]
+  const runHabitGeneration = useCallback(async (kidIndex: number, kid: KidProfile | undefined) => {
     if (!kid || !kid.name || !kid.age) {
       setHabitError('Please add name and age first.')
       return
@@ -224,6 +240,7 @@ export function OnboardingWizard() {
         childName: kid.name,
         age: kid.age,
         focusAreas: kid.focusAreas,
+        notes: kid.notes,
       })
       setKids((prev) =>
         prev.map((existing, idx) => {
@@ -240,27 +257,27 @@ export function OnboardingWizard() {
     } finally {
       setHabitLoading(false)
     }
-  }
+  }, [])
 
   useEffect(() => {
     if (step.stage !== 'habits') return
     const kid = kids[step.index]
     if (!kid) return
     if ((kid.habits.core.length === 0 && kid.habits.bonus.length === 0) && !habitLoading) {
-      void runHabitGeneration(step.index)
+      void runHabitGeneration(step.index, kid)
     }
-  }, [step, kids, habitLoading])
+  }, [step, kids, habitLoading, runHabitGeneration])
 
-  const runRewardGeneration = async () => {
+  const runRewardGeneration = useCallback(async (plan: StorePlan, firstChildName?: string) => {
     setRewardLoading(true)
     setRewardError(null)
     try {
       const result = await generateRewardSuggestions({
-        familyName: kids[0]?.name,
-        budget: store.budget,
-        currency: store.currency,
-        motivators: store.motivators,
-        values: store.values,
+        familyName: firstChildName,
+        budget: plan.budget,
+        currency: plan.currency,
+        motivators: plan.motivators,
+        values: plan.values,
       })
       setStore((prev) => ({
         ...prev,
@@ -276,7 +293,7 @@ export function OnboardingWizard() {
     } finally {
       setRewardLoading(false)
     }
-  }
+  }, [])
 
   useEffect(() => {
     if (step.stage !== 'store-suggestions') return
@@ -286,9 +303,9 @@ export function OnboardingWizard() {
       store.suggestions.big.length === 0 &&
       !rewardLoading
     ) {
-      void runRewardGeneration()
+      void runRewardGeneration(store, kids[0]?.name)
     }
-  }, [step, store, rewardLoading])
+  }, [step, store, rewardLoading, runRewardGeneration, kids])
 
   const handleStoreChange = (updates: Partial<StorePlan>) => {
     setStore((prev) => ({ ...prev, ...updates }))
@@ -509,7 +526,11 @@ export function OnboardingWizard() {
             kid={kid}
             onChange={(updated) => updateKid(step.index, updated)}
             onNext={() => setStep({ stage: 'focus', index: step.index })}
-            onBack={step.index === 0 ? undefined : () => setStep({ stage: 'habits', index: step.index - 1 })}
+            onBack={
+              step.index === 0
+                ? () => setStep({ stage: 'kid-count' })
+                : () => setStep({ stage: 'habits', index: step.index - 1 })
+            }
           />
         )
       }
@@ -537,7 +558,7 @@ export function OnboardingWizard() {
             onHabitAdd={(type) => addHabit(step.index, type)}
             onHabitChange={(type, idx, habit) => updateHabit(step.index, type, idx, habit)}
             onHabitRemove={(type, idx) => removeHabit(step.index, type, idx)}
-            onRegenerate={() => runHabitGeneration(step.index)}
+            onRegenerate={() => runHabitGeneration(step.index, kid)}
             onBack={() => setStep({ stage: 'focus', index: step.index })}
             onNext={() => goToNextKidOrStore(step.index)}
           />
@@ -566,7 +587,7 @@ export function OnboardingWizard() {
             onRewardAdd={handleRewardAdd}
             onRewardChange={handleRewardChange}
             onRewardRemove={handleRewardRemove}
-            onRegenerate={runRewardGeneration}
+            onRegenerate={() => runRewardGeneration(store, kids[0]?.name)}
             onBack={() => setStep({ stage: 'store', screen: 'values' })}
             onNext={() => setStep({ stage: 'ready' })}
           />
@@ -602,7 +623,7 @@ export function OnboardingWizard() {
             <p className="text-sm font-bold text-charcoal-light">StarqueZZ Onboarding</p>
             <h1 className="text-3xl font-black text-charcoal">Conversational setup wizard</h1>
           </div>
-          {step.stage !== 'welcome' && step.stage !== 'ready' && (
+          {step.stage !== 'welcome' && (
             <Button variant="ghost" className="text-charcoal" onClick={handleStartOver}>
               ↻ Start Over
             </Button>

@@ -164,7 +164,7 @@ export function ParentPinEntry() {
       if (updateError) throw updateError
 
       setParentPinSession()
-      navigate('/parent/approvals')
+      navigate('/onboarding')
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to set PIN')
     } finally {

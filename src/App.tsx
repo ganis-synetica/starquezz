@@ -19,7 +19,14 @@ function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<HomePage />} />
-        <Route path="/onboarding" element={<Onboarding />} />
+        <Route
+          path="/onboarding"
+          element={
+            <ProtectedRoute>
+              <Onboarding />
+            </ProtectedRoute>
+          }
+        />
         <Route path="/signup" element={<ParentSignUp />} />
         <Route path="/login" element={<ParentLogin />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />

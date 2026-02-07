@@ -18,17 +18,19 @@ export function HomePage() {
 
   // Check onboarding status
   useEffect(() => {
-    if (!checkOnboarded()) {
+    if (status === 'authenticated' && !checkOnboarded()) {
       navigate('/onboarding')
     }
-  }, [navigate])
+  }, [status, navigate])
 
   useEffect(() => {
     if (status === 'loading') return
     
     if (status !== 'authenticated' || !user) {
-      setKids([])
-      setLoading(false)
+      Promise.resolve().then(() => {
+        setKids([])
+        setLoading(false)
+      })
       return
     }
 

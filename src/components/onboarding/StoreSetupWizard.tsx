@@ -61,34 +61,43 @@ export function StoreSetupWizard({
     </div>
   )
 
-  const renderBudget = () => (
-    <div className="space-y-4">
-      <h2 className="text-3xl font-black text-charcoal">What's your monthly reward budget?</h2>
-      <p className="text-charcoal-light">We use this to scale small treats vs big adventures.</p>
-      <div className="bg-white border-4 border-charcoal rounded-2xl p-4 space-y-3">
-        <input
-          type="range"
+  const renderBudget = () => {
+    const displayCurrency =
+      store.currency === 'IDR'
+        ? 'Rp'
+        : store.currency === 'OTHER'
+          ? store.customCurrency || '⭐'
+          : store.currency || '⭐'
+
+    return (
+      <div className="space-y-4">
+        <h2 className="text-3xl font-black text-charcoal">What's your monthly reward budget?</h2>
+        <p className="text-charcoal-light">We use this to scale small treats vs big adventures.</p>
+        <div className="bg-white border-4 border-charcoal rounded-2xl p-4 space-y-3">
+          <input
+            type="range"
+            min={0}
+            max={500000}
+            step={10000}
+            value={store.budget}
+            onChange={(event) => onBudgetChange(Number(event.target.value))}
+            className="w-full accent-lavender"
+          />
+          <p className="text-center text-2xl font-black text-charcoal">
+            {displayCurrency} {store.budget.toLocaleString()}
+          </p>
+          <p className="text-xs text-center text-charcoal-light">Max reward ≈ two weeks of earning, so dream big!</p>
+        </div>
+        <Input
+          type="number"
           min={0}
-          max={500000}
-          step={10000}
           value={store.budget}
-          onChange={(event) => onBudgetChange(Number(event.target.value))}
-          className="w-full accent-lavender"
+          onChange={(event) => onBudgetChange(Number(event.target.value) || 0)}
+          className="text-right"
         />
-        <p className="text-center text-2xl font-black text-charcoal">
-          {store.currency === 'IDR' ? 'Rp' : store.currency} {store.budget.toLocaleString()}
-        </p>
-        <p className="text-xs text-center text-charcoal-light">Max reward ≈ two weeks of earning, so dream big!</p>
       </div>
-      <Input
-        type="number"
-        min={0}
-        value={store.budget}
-        onChange={(event) => onBudgetChange(Number(event.target.value) || 0)}
-        className="text-right"
-      />
-    </div>
-  )
+    )
+  }
 
   const renderMotivators = () => (
     <div className="space-y-4">

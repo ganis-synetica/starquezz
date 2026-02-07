@@ -8,13 +8,14 @@ import type {
 } from '@/types/onboarding'
 
 const OPENROUTER_URL = 'https://openrouter.ai/api/v1/chat/completions'
-const OPENROUTER_MODEL = 'gpt-4o-mini'
+const OPENROUTER_MODEL = 'google/gemini-2.0-flash-001'
 const OPENROUTER_API_KEY = import.meta.env.VITE_OPENROUTER_API_KEY as string | undefined
 
 type HabitGenerationInput = {
   childName: string
   age: number
   focusAreas: FocusAreaId[]
+  notes?: string
 }
 
 type RewardGenerationInput = {
@@ -178,7 +179,8 @@ function pickTemplates(
 
 function buildHabitFallback(input: HabitGenerationInput): HabitGenerationResult {
   const taken = new Set<string>()
-  const selectedAreas = input.focusAreas.length ? input.focusAreas : (['learning', 'self_care'] satisfies FocusAreaId[])
+  const fallbackAreas: FocusAreaId[] = ['learning', 'self_care']
+  const selectedAreas = input.focusAreas.length ? input.focusAreas : fallbackAreas
 
   const core: HabitIdea[] = []
   for (const area of selectedAreas) {
@@ -365,11 +367,20 @@ export async function generateHabitSuggestions(input: HabitGenerationInput): Pro
         {
           role: 'system',
           content:
-            'You are Musang, a playful parenting coach for StarqueZZ. Suggest age-appropriate kids habits. Keep descriptions short and fun.',
+            `You are Musang 🦝, StarqueZZ's friendly guide — clever, warm, and a little playful. You help parents design habits that feel like adventures, not chores. You balance fun with real growth, and you respect each child's unique personality. Suggest age-appropriate habits with short, fun descriptions. Always include emojis in titles.`,
         },
         {
           role: 'user',
-          content: `Child name: ${input.childName}\nAge: ${input.age}\nFocus areas: ${input.focusAreas.join(', ') || 'general kindness'}\nReturn JSON with core (max 3) and bonus (3-5) habits. Include emojis in titles.`,
+          content: `Child name: ${input.childName}
+Age: ${input.age}
+Focus areas: ${input.focusAreas.join(', ') || 'balanced growth'}
+${input.notes ? `Parent notes: ${input.notes}` : ''}
+
+Create personalized daily quests for this child. Return JSON with:
+- core: 3 essential habits (daily must-dos)
+- bonus: 3-5 fun extras (occasional wins)
+
+Make them specific to this child based on their age, focus areas, and any notes provided.`,
         },
       ],
       schema,

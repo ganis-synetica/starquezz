@@ -12,6 +12,7 @@ export type KidProfile = {
   name: string
   age: number | null
   avatar: string
+  notes: string
   focusAreas: FocusAreaId[]
   habits: {
     core: HabitIdea[]

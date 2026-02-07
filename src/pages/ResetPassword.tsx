@@ -22,7 +22,9 @@ export function ResetPassword() {
     const type = hashParams.get('type')
 
     if (!accessToken || type !== 'recovery') {
-      setError('Invalid or expired reset link. Please request a new one.')
+      Promise.resolve().then(() => {
+        setError('Invalid or expired reset link. Please request a new one.')
+      })
     }
   }, [])
 
