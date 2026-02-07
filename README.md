@@ -1,73 +1,66 @@
-# React + TypeScript + Vite
+# ⭐ StarqueZZ
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+**Gamified habit tracking for kids** - Turn daily responsibilities into fun quests!
 
-Currently, two official plugins are available:
+## Overview
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+StarqueZZ is a Progressive Web App designed for children aged 5-8 (specifically Zen & Zia). It transforms daily habits into engaging quests where kids earn stars for completions and redeem them for real-world rewards.
 
-## React Compiler
+## Features (MVP)
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+### For Kids 👧👦
+- **Daily Quests** - Core habits that must be completed
+- **Bonus Quests** - Extra habits that unlock after cores
+- **Star Economy** - Earn stars, see your balance grow
+- **Star Store** - Redeem stars for rewards set by parents
+- **Weekly Streak Bonus** - 50% bonus for completing all 7 days
 
-## Expanding the ESLint configuration
+### For Parents 👨‍👩‍👧‍👦
+- **Habit Builder** - Create age-appropriate habits
+- **LLM-Powered Suggestions** - AI recommends habits based on child's age & focus areas
+- **Approval System** - Review completions (24h auto-approve)
+- **Reward Manager** - Define real-world rewards
+- **Progress Tracking** - Weekly reports & streaks
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## Habit Categories
+- 🎹 **Learning** - Piano, writing, reading
+- 🧹 **Helping Out** - Tidy room, set table
+- 🪥 **Self-Care** - Brush teeth, shower
+- 💪 **Growth** - Exercise, focus time
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## Tech Stack
+- **Frontend**: React + Vite + TypeScript
+- **Styling**: Tailwind CSS (Neo-Brutalism theme)
+- **Backend**: Supabase (Auth, Postgres, Edge Functions)
+- **AI**: OpenRouter (gpt-4o-mini for habit suggestions)
+- **Hosting**: Vercel
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+## Getting Started
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+# Install dependencies
+npm install
+
+# Set up environment variables
+cp .env.example .env.local
+# Fill in your Supabase and OpenRouter keys
+
+# Run development server
+npm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## Environment Variables
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
 ```
+VITE_SUPABASE_URL=https://your-project.supabase.co
+VITE_SUPABASE_ANON_KEY=your-anon-key
+VITE_OPENROUTER_API_KEY=your-openrouter-key
+```
+
+## Live Demo
+
+🚀 https://starquezz.musang.dev
+
+---
+
+Built with ❤️ for Zen & Zia by Synetica
