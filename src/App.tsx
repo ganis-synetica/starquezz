@@ -9,8 +9,10 @@ import { ForgotPassword } from './pages/ForgotPassword'
 import { ResetPassword } from './pages/ResetPassword'
 import { Onboarding } from './pages/Onboarding'
 import { ParentSetupWizard } from './pages/ParentSetupWizard'
+import { ParentPinEntry } from './pages/ParentPinEntry'
 import { ProtectedRoute } from './components/auth/ProtectedRoute'
 import { ChildProtectedRoute } from './components/auth/ChildProtectedRoute'
+import { ParentPinProtectedRoute } from './components/auth/ParentPinProtectedRoute'
 
 function App() {
   return (
@@ -22,6 +24,18 @@ function App() {
         <Route path="/login" element={<ParentLogin />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password" element={<ResetPassword />} />
+        
+        {/* Parent PIN entry */}
+        <Route
+          path="/parent/pin"
+          element={
+            <ProtectedRoute>
+              <ParentPinEntry />
+            </ProtectedRoute>
+          }
+        />
+        
+        {/* Parent setup wizard */}
         <Route
           path="/parent/setup"
           element={
@@ -31,6 +45,7 @@ function App() {
           }
         />
 
+        {/* Child routes */}
         <Route
           path="/child/:id"
           element={
@@ -48,12 +63,13 @@ function App() {
           }
         />
 
+        {/* Parent dashboard (requires PIN) */}
         <Route
           path="/parent/approvals"
           element={
-            <ProtectedRoute>
+            <ParentPinProtectedRoute>
               <ApprovalQueue />
-            </ProtectedRoute>
+            </ParentPinProtectedRoute>
           }
         />
       </Routes>

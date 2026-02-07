@@ -110,7 +110,7 @@ export function HomePage() {
         {/* Parent Login */}
         <div className="text-center">
           {status === 'authenticated' ? (
-            <Button variant="outline" className="bg-white" onClick={() => navigate('/parent/approvals')}>
+            <Button variant="outline" className="bg-white" onClick={() => navigate('/parent/pin')}>
               👨‍👩‍👧‍👦 Parent Dashboard
             </Button>
           ) : (

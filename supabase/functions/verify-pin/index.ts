@@ -2,9 +2,14 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import * as bcrypt from "https://deno.land/x/bcrypt@v0.4.1/mod.ts";
 
-type VerifyPinRequest = {
-  child_id: string;
-  pin: string;
+type RequestPayload = {
+  // For hashing a new PIN
+  action?: 'hash' | 'verify';
+  pin?: string;
+  hash?: string;
+  
+  // Legacy: child PIN verification
+  child_id?: string;
 };
 
 function jsonResponse(status: number, body: unknown) {
@@ -23,37 +28,58 @@ Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return jsonResponse(200, { ok: true });
   if (req.method !== "POST") return jsonResponse(405, { error: "Method not allowed" });
 
-  let payload: VerifyPinRequest;
+  let payload: RequestPayload;
   try {
-    payload = (await req.json()) as VerifyPinRequest;
+    payload = (await req.json()) as RequestPayload;
   } catch {
     return jsonResponse(400, { error: "Invalid JSON" });
   }
 
-  const child_id = payload?.child_id?.trim();
+  const action = payload?.action;
   const pin = payload?.pin?.trim();
 
-  if (!child_id || !pin) {
-    return jsonResponse(400, { error: "Missing child_id or pin" });
+  // Action: hash - create a bcrypt hash from a PIN
+  if (action === 'hash') {
+    if (!pin || pin.length !== 4 || !/^\d{4}$/.test(pin)) {
+      return jsonResponse(400, { error: "PIN must be exactly 4 digits" });
+    }
+    const hash = await bcrypt.hash(pin);
+    return jsonResponse(200, { hash });
   }
 
-  const url = Deno.env.get("SUPABASE_URL");
-  const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
-  if (!url || !serviceRoleKey) {
-    return jsonResponse(500, { error: "Server misconfigured" });
+  // Action: verify - verify a PIN against a provided hash
+  if (action === 'verify') {
+    const hash = payload?.hash?.trim();
+    if (!pin || !hash) {
+      return jsonResponse(400, { error: "Missing pin or hash" });
+    }
+    const valid = await bcrypt.compare(pin, hash);
+    return jsonResponse(200, { valid });
   }
 
-  const supabase = createClient(url, serviceRoleKey);
+  // Legacy: child PIN verification (for backward compatibility)
+  const child_id = payload?.child_id?.trim();
+  if (child_id && pin) {
+    const url = Deno.env.get("SUPABASE_URL");
+    const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+    if (!url || !serviceRoleKey) {
+      return jsonResponse(500, { error: "Server misconfigured" });
+    }
 
-  const { data, error } = await supabase
-    .from("children")
-    .select("pin_hash")
-    .eq("id", child_id)
-    .maybeSingle();
+    const supabase = createClient(url, serviceRoleKey);
 
-  if (error) return jsonResponse(500, { error: "DB error" });
-  if (!data?.pin_hash) return jsonResponse(200, { success: false });
+    const { data, error } = await supabase
+      .from("children")
+      .select("pin_hash")
+      .eq("id", child_id)
+      .maybeSingle();
 
-  const success = await bcrypt.compare(pin, data.pin_hash);
-  return jsonResponse(200, { success });
+    if (error) return jsonResponse(500, { error: "DB error" });
+    if (!data?.pin_hash) return jsonResponse(200, { success: false });
+
+    const success = await bcrypt.compare(pin, data.pin_hash);
+    return jsonResponse(200, { success });
+  }
+
+  return jsonResponse(400, { error: "Invalid request. Use action: 'hash' or 'verify'" });
 });
