@@ -69,12 +69,12 @@ export function Onboarding() {
 
       {/* Main content */}
       <div className="flex-1 flex flex-col items-center justify-center max-w-md mx-auto">
-        {/* Illustration */}
-        <div className="w-64 h-64 mb-8 rounded-3xl overflow-hidden bg-white/50 flex items-center justify-center border-4 border-black/10">
+        {/* Illustration - 16:9 landscape to match source images (1408×768), no crop */}
+        <div className="w-full max-w-[20rem] aspect-video mb-8 rounded-3xl overflow-hidden bg-white/50 flex items-center justify-center border-4 border-black/10">
           <img
             src={screen.image}
             alt={screen.title}
-            className="w-full h-full object-cover"
+            className="w-full h-full object-contain"
             onError={(e) => {
               // Fallback to emoji if image not found
               e.currentTarget.style.display = 'none'
