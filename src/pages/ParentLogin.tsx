@@ -75,16 +75,9 @@ export function ParentLogin() {
               </Button>
 
               <div className="flex items-center justify-between text-sm font-bold">
-                <a
-                  className="underline"
-                  href="#"
-                  onClick={(e) => {
-                    e.preventDefault()
-                    setError('Password resets are handled by Supabase. (Hook up reset email later.)')
-                  }}
-                >
+                <Link className="underline" to="/forgot-password">
                   Forgot password?
-                </a>
+                </Link>
                 <Link className="underline" to="/signup">
                   Create account
                 </Link>

@@ -6,6 +6,8 @@ import { ParentLogin } from './pages/ParentLogin'
 import { ParentSignUp } from './pages/ParentSignUp'
 import { PinEntry } from './pages/PinEntry'
 import { ApprovalQueue } from './pages/ApprovalQueue'
+import { ForgotPassword } from './pages/ForgotPassword'
+import { Onboarding } from './pages/Onboarding'
 import { ProtectedRoute } from './components/auth/ProtectedRoute'
 import { ChildProtectedRoute } from './components/auth/ChildProtectedRoute'
 
@@ -14,8 +16,10 @@ function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<HomePage />} />
+        <Route path="/onboarding" element={<Onboarding />} />
         <Route path="/signup" element={<ParentSignUp />} />
         <Route path="/login" element={<ParentLogin />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/pin/:id" element={<PinEntry />} />
 
         <Route

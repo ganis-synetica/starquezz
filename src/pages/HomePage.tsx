@@ -6,6 +6,7 @@ import { supabase } from "@/lib/supabase"
 import type { Child } from "@/types"
 import { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
+import { checkOnboarded } from "./Onboarding"
 
 export function HomePage() {
   const { status, user } = useAuth()
@@ -13,6 +14,13 @@ export function HomePage() {
 
   const [kids, setKids] = useState<Array<Pick<Child, 'id' | 'name' | 'stars' | 'avatar'>>>([])
   const [error, setError] = useState<string | null>(null)
+
+  // Check onboarding status
+  useEffect(() => {
+    if (!checkOnboarded()) {
+      navigate('/onboarding')
+    }
+  }, [navigate])
 
   useEffect(() => {
     if (status !== 'authenticated' || !user) {
