@@ -25,8 +25,13 @@ export function ForgotPassword() {
     }
 
     setLoading(true)
+    // Use production URL for redirect
+    const redirectUrl = import.meta.env.PROD 
+      ? 'https://starquezz.musang.dev/reset-password'
+      : `${window.location.origin}/reset-password`
+    
     const { error: resetError } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${window.location.origin}/login`,
+      redirectTo: redirectUrl,
     })
 
     setLoading(false)
