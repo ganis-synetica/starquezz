@@ -205,7 +205,7 @@ export function ChildDashboard() {
         </div>
 
         {/* Star Store Button */}
-        <Button className="w-full bg-yellow-400 text-black hover:bg-yellow-300" size="lg" onClick={() => navigate('/store')}>
+        <Button className="w-full bg-yellow-400 text-black hover:bg-yellow-300" size="lg" onClick={() => navigate(`/store/${childId}`)}>
           🛒 Star Store
         </Button>
 

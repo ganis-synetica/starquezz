@@ -40,7 +40,7 @@ function App() {
           }
         />
         <Route
-          path="/store"
+          path="/store/:id"
           element={
             <ChildProtectedRoute>
               <StarStore />

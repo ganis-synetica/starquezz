@@ -2,16 +2,15 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Star, ArrowLeft, ShoppingBag } from "lucide-react"
 import { useAuth } from "@/contexts/AuthContext"
-import { useChildSession } from "@/contexts/ChildContext"
 import { supabase } from "@/lib/supabase"
 import { listRewardsForChild } from "@/services/rewards"
 import type { Child, Reward } from "@/types"
 import { useEffect, useState } from "react"
-import { useNavigate } from "react-router-dom"
+import { useNavigate, useParams } from "react-router-dom"
 
 export function StarStore() {
   const { user } = useAuth()
-  const { childId } = useChildSession()
+  const { id: childId } = useParams()
   const navigate = useNavigate()
 
   const [child, setChild] = useState<Pick<Child, 'id' | 'name' | 'stars'> | null>(null)
