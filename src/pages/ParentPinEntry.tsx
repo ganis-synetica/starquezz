@@ -284,7 +284,9 @@ export function ParentPinEntry() {
 
             {error && (
               <div className="mb-4 bg-coral-light border-2 border-coral p-2 rounded-lg text-sm font-bold text-coral text-center">
-                {error}
+                {error.includes('column') || error.includes('relation') || error.includes('PGRST') 
+                  ? 'Something went wrong. Please try again or contact support.'
+                  : error}
               </div>
             )}
 
