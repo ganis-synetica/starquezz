@@ -10,6 +10,7 @@ import { ResetPassword } from './pages/ResetPassword'
 import { Onboarding } from './pages/Onboarding'
 import { ParentSetupWizard } from './pages/ParentSetupWizard'
 import { ParentPinEntry } from './pages/ParentPinEntry'
+import { AddChildWizard } from './pages/AddChildWizard'
 import { ProtectedRoute } from './components/auth/ProtectedRoute'
 import { ChildProtectedRoute } from './components/auth/ChildProtectedRoute'
 import { ParentPinProtectedRoute } from './components/auth/ParentPinProtectedRoute'
@@ -49,6 +50,16 @@ function App() {
             <ProtectedRoute>
               <ParentSetupWizard />
             </ProtectedRoute>
+          }
+        />
+
+        {/* Add child wizard (requires PIN) */}
+        <Route
+          path="/parent/add-child"
+          element={
+            <ParentPinProtectedRoute>
+              <AddChildWizard />
+            </ParentPinProtectedRoute>
           }
         />
 

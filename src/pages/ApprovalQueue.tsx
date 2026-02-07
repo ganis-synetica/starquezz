@@ -466,7 +466,7 @@ export function ApprovalQueue() {
           <div>
             <div className="flex justify-between items-center mb-4">
               <p className="text-lg font-bold text-charcoal">Manage Children</p>
-              <Button size="sm" onClick={() => navigate('/parent/setup')} className="bg-sage text-charcoal hover:bg-sage-light">
+              <Button size="sm" onClick={() => navigate('/parent/add-child')} className="bg-sage text-charcoal hover:bg-sage-light">
                 <Plus className="w-4 h-4 mr-1" /> Add Child
               </Button>
             </div>
