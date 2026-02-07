@@ -9,7 +9,7 @@ export interface Child {
   parent_id: string
   name: string
   pin_hash: string
-  avatar_url?: string
+  avatar: string
   theme?: ThemeConfig
   stars: number
   created_at: string
@@ -23,6 +23,7 @@ export interface Habit {
   description?: string
   category: 'learning' | 'helping' | 'self_care' | 'growth'
   is_core: boolean
+  active?: boolean
   created_at: string
 }
 
@@ -36,6 +37,7 @@ export interface HabitCompletion {
   rejected_at?: string
   rejection_reason?: string
   stars_earned: number
+  completed_date?: string
 }
 
 export interface Reward {

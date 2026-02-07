@@ -1,30 +1,58 @@
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Star, ArrowLeft, ShoppingBag } from "lucide-react"
-
-const DEMO_REWARDS = [
-  { id: "1", title: "Ice Cream Trip 🍦", cost: 10, description: "A delicious treat!" },
-  { id: "2", title: "Movie Night 🎬", cost: 25, description: "Pick any movie!" },
-  { id: "3", title: "New Book 📚", cost: 15, description: "Choose a fun book" },
-  { id: "4", title: "Extra Screen Time 📱", cost: 20, description: "30 minutes bonus!" },
-  { id: "5", title: "Pizza Party 🍕", cost: 50, description: "With your favorite toppings!" },
-]
+import { useAuth } from "@/contexts/AuthContext"
+import { useChildSession } from "@/contexts/ChildContext"
+import { supabase } from "@/lib/supabase"
+import { listRewardsForChild } from "@/services/rewards"
+import type { Child, Reward } from "@/types"
+import { useEffect, useState } from "react"
+import { useNavigate } from "react-router-dom"
 
 export function StarStore() {
-  const stars = 24
-  const childName = "Zen"
+  const { user } = useAuth()
+  const { childId } = useChildSession()
+  const navigate = useNavigate()
+
+  const [child, setChild] = useState<Pick<Child, 'id' | 'name' | 'stars'> | null>(null)
+  const [rewards, setRewards] = useState<Reward[]>([])
+  const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    if (!childId) {
+      navigate('/')
+      return
+    }
+    if (!user) return
+
+    void (async () => {
+      setError(null)
+      const { data: childData, error: childError } = await supabase
+        .from('children')
+        .select('id,name,stars')
+        .eq('id', childId)
+        .single()
+      if (childError) throw childError
+      setChild(childData as Pick<Child, 'id' | 'name' | 'stars'>)
+
+      const rs = await listRewardsForChild(user.id)
+      setRewards(rs)
+    })().catch((err) => {
+      setError(err instanceof Error ? err.message : 'Could not load rewards.')
+    })
+  }, [childId, navigate, user])
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-yellow-200 to-orange-200 p-4">
       <div className="max-w-md mx-auto">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
-          <Button variant="ghost" size="icon">
+          <Button variant="ghost" size="icon" onClick={() => navigate(-1)}>
             <ArrowLeft className="w-6 h-6" />
           </Button>
           <div className="flex items-center gap-2 bg-yellow-300 px-4 py-2 rounded-full border-4 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
             <Star className="w-6 h-6 fill-yellow-500 text-yellow-700" />
-            <span className="text-xl font-black">{stars}</span>
+            <span className="text-xl font-black">{child?.stars ?? 0}</span>
           </div>
         </div>
 
@@ -33,14 +61,20 @@ export function StarStore() {
           <ShoppingBag className="w-16 h-16 mx-auto mb-2 text-purple-600" />
           <h1 className="text-3xl font-black">Star Store</h1>
           <p className="text-lg font-bold text-gray-700">
-            What will you get, {childName}? 🤩
+            What will you get, {child?.name ?? 'Explorer'}? 🤩
           </p>
         </div>
 
+        {error && (
+          <div className="mb-4 bg-red-100 border-4 border-black p-3 rounded-xl text-sm font-bold text-red-800">
+            {error}
+          </div>
+        )}
+
         {/* Rewards Grid */}
         <div className="space-y-4">
-          {DEMO_REWARDS.map((reward) => {
-            const canAfford = stars >= reward.cost
+          {rewards.map((reward) => {
+            const canAfford = (child?.stars ?? 0) >= reward.star_cost
             return (
               <Card 
                 key={reward.id} 
@@ -55,7 +89,7 @@ export function StarStore() {
                     <div className="text-right">
                       <div className="flex items-center gap-1 justify-end">
                         <Star className="w-5 h-5 fill-yellow-400 text-yellow-600" />
-                        <span className="text-xl font-black">{reward.cost}</span>
+                        <span className="text-xl font-black">{reward.star_cost}</span>
                       </div>
                       {canAfford ? (
                         <Button size="sm" className="mt-2 bg-green-400 text-black hover:bg-green-300">
@@ -63,7 +97,7 @@ export function StarStore() {
                         </Button>
                       ) : (
                         <p className="text-xs font-bold text-gray-500 mt-2">
-                          Need {reward.cost - stars} more
+                          Need {reward.star_cost - (child?.stars ?? 0)} more
                         </p>
                       )}
                     </div>

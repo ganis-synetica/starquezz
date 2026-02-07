@@ -1,13 +1,40 @@
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Star, Sparkles } from "lucide-react"
-
-const DEMO_KIDS = [
-  { id: "1", name: "Zen", stars: 24, avatar: "🦊" },
-  { id: "2", name: "Zia", stars: 18, avatar: "🦋" },
-]
+import { useAuth } from "@/contexts/AuthContext"
+import { supabase } from "@/lib/supabase"
+import type { Child } from "@/types"
+import { useEffect, useState } from "react"
+import { useNavigate } from "react-router-dom"
 
 export function HomePage() {
+  const { status, user } = useAuth()
+  const navigate = useNavigate()
+
+  const [kids, setKids] = useState<Array<Pick<Child, 'id' | 'name' | 'stars' | 'avatar'>>>([])
+  const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    if (status !== 'authenticated' || !user) {
+      setKids([])
+      return
+    }
+
+    void (async () => {
+      setError(null)
+      const { data, error: fetchError } = await supabase
+        .from('children')
+        .select('id,name,stars,avatar')
+        .order('created_at', { ascending: true })
+
+      if (fetchError) {
+        setError(fetchError.message)
+        return
+      }
+      setKids((data ?? []) as Array<Pick<Child, 'id' | 'name' | 'stars' | 'avatar'>>)
+    })()
+  }, [status, user])
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-yellow-200 to-orange-200 p-6">
       <div className="max-w-md mx-auto">
@@ -25,10 +52,17 @@ export function HomePage() {
         {/* Kid Profiles */}
         <div className="space-y-4 mb-8">
           <h2 className="text-xl font-bold text-center">Who's ready to quest?</h2>
-          {DEMO_KIDS.map((kid) => (
+          {error && <p className="text-sm font-bold text-red-700 text-center">{error}</p>}
+          {status !== 'authenticated' && (
+            <p className="text-sm font-bold text-gray-700 text-center">
+              Parents: log in to load real profiles.
+            </p>
+          )}
+          {kids.map((kid) => (
             <Card 
               key={kid.id} 
               className="cursor-pointer hover:translate-x-1 hover:translate-y-1 hover:shadow-none transition-all bg-white"
+              onClick={() => navigate(`/pin/${kid.id}`)}
             >
               <CardContent className="p-4">
                 <div className="flex items-center gap-4">
@@ -49,9 +83,15 @@ export function HomePage() {
 
         {/* Parent Login */}
         <div className="text-center">
-          <Button variant="outline" className="bg-white">
-            👨‍👩‍👧‍👦 Parent Dashboard
-          </Button>
+          {status === 'authenticated' ? (
+            <Button variant="outline" className="bg-white" onClick={() => navigate('/parent/approvals')}>
+              👨‍👩‍👧‍👦 Parent Dashboard
+            </Button>
+          ) : (
+            <Button variant="outline" className="bg-white" onClick={() => navigate('/login')}>
+              👨‍👩‍👧‍👦 Parent Login
+            </Button>
+          )}
         </div>
 
         {/* Fun footer */}
