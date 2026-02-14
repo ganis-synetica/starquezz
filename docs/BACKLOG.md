@@ -15,16 +15,17 @@
 - [x] Password verification to reset PIN (no email needed)
 - [x] Inline PIN reset after verification
 
-### 🔴 Notifications
+### ⏭️ SKIPPED - Notifications (requires backend setup)
 - [ ] Push notifications for pending approvals
 - [ ] Email digest for parents (daily/weekly)
+- *Reason: Requires email service and push notification infrastructure*
 
 ---
 
 ## Medium Priority (Polish)
 
 ### 🟡 Child Experience
-- [ ] Quick switch between children from dashboard
+- [x] Quick switch between children from dashboard
 - [ ] Habit completion animations / sounds
 - [ ] Streak counter on dashboard
 - [ ] Habit history view (past completions)

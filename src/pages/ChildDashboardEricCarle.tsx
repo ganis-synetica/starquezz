@@ -3,6 +3,7 @@ import { useChildSession } from "@/contexts/ChildContext"
 import { supabase } from "@/lib/supabase"
 import { listHabitsForChild } from "@/services/habits"
 import { createCompletion, listCompletionsForChildOnDate } from "@/services/completions"
+import { SiblingSelector } from "@/components/SiblingSelector"
 import type { Child, Habit } from "@/types"
 import { useEffect, useMemo, useState } from "react"
 import { useNavigate, useParams } from "react-router-dom"
@@ -109,6 +110,9 @@ export function ChildDashboardEricCarle() {
     >
       <div className="max-w-md mx-auto">
         
+        {/* Sibling Selector */}
+        {childId && <SiblingSelector currentChildId={childId} className="mb-4" />}
+
         {/* Header - Collage style sun with stars */}
         <div className="flex items-center justify-between mb-8">
           <button 

@@ -5,6 +5,7 @@ import { useChildSession } from "@/contexts/ChildContext"
 import { supabase } from "@/lib/supabase"
 import { listHabitsForChild } from "@/services/habits"
 import { createCompletion, listCompletionsForChildOnDate } from "@/services/completions"
+import { SiblingSelector } from "@/components/SiblingSelector"
 import type { Child, Habit } from "@/types"
 import { useEffect, useMemo, useState } from "react"
 import { useNavigate, useParams } from "react-router-dom"
@@ -90,6 +91,9 @@ export function ChildDashboard() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-lavender-light to-rose-light p-4">
       <div className="max-w-md mx-auto">
+        {/* Sibling Selector */}
+        {childId && <SiblingSelector currentChildId={childId} className="mt-4 mb-2" />}
+
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <Button variant="ghost" size="icon" onClick={() => navigate('/')}

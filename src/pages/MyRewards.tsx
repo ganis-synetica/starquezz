@@ -4,6 +4,7 @@ import { Star, ArrowLeft, Gift, Clock, Check, X } from "lucide-react"
 import { useChildSession } from "@/contexts/ChildContext"
 import { supabase } from "@/lib/supabase"
 import { listRedemptionsForChild, type RedemptionWithDetails } from "@/services/redemptions"
+import { SiblingSelector } from "@/components/SiblingSelector"
 import type { Child } from "@/types"
 import { useEffect, useState } from "react"
 import { useNavigate, useParams } from "react-router-dom"
@@ -91,6 +92,9 @@ export function MyRewards() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-cream to-lavender-light p-4">
       <div className="max-w-md mx-auto">
+        {/* Sibling Selector */}
+        {childId && <SiblingSelector currentChildId={childId} className="mt-4 mb-2" />}
+
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <Button variant="ghost" size="icon" onClick={() => navigate(-1)}>

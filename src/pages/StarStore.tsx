@@ -5,6 +5,7 @@ import { useAuth } from "@/contexts/AuthContext"
 import { supabase } from "@/lib/supabase"
 import { listRewardsForChild } from "@/services/rewards"
 import { createRedemption } from "@/services/redemptions"
+import { SiblingSelector } from "@/components/SiblingSelector"
 import type { Child, Reward } from "@/types"
 import { useEffect, useState } from "react"
 import { useNavigate, useParams } from "react-router-dom"
@@ -82,6 +83,9 @@ export function StarStore() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-cream to-coral-light p-4">
       <div className="max-w-md mx-auto">
+        {/* Sibling Selector */}
+        {childId && <SiblingSelector currentChildId={childId} className="mt-4 mb-2" />}
+
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <Button variant="ghost" size="icon" onClick={() => navigate(-1)}>
