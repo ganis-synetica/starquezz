@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { HomePage } from './pages/HomePage'
 import { ChildDashboard } from './pages/ChildDashboard'
+import { ChildDashboardEricCarle } from './pages/ChildDashboardEricCarle'
 import { StarStore } from './pages/StarStore'
 import { ParentLogin } from './pages/ParentLogin'
 import { ParentSignUp } from './pages/ParentSignUp'
@@ -69,6 +70,16 @@ function App() {
           element={
             <ChildProtectedRoute>
               <ChildDashboard />
+            </ChildProtectedRoute>
+          }
+        />
+        
+        {/* Design preview - Eric Carle style */}
+        <Route
+          path="/preview/eric-carle/:id"
+          element={
+            <ChildProtectedRoute>
+              <ChildDashboardEricCarle />
             </ChildProtectedRoute>
           }
         />

@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <title>Starquezz - Studio Ghibli Style</title>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Nunito', system-ui, sans-serif;
+      background: linear-gradient(180deg, #E8F4F8 0%, #D4E8ED 50%, #C5DFE6 100%);
+      min-height: 100vh;
+      padding: 16px;
+      position: relative;
+      overflow-x: hidden;
+    }
+    .container { max-width: 400px; margin: 0 auto; position: relative; z-index: 1; }
+    
+    /* Floating clouds */
+    .cloud {
+      position: fixed; background: rgba(255,255,255,0.7); border-radius: 50px;
+      filter: blur(1px);
+    }
+    .cloud-1 { width: 120px; height: 40px; top: 10%; left: -20px; animation: float 20s ease-in-out infinite; }
+    .cloud-2 { width: 80px; height: 30px; top: 25%; right: -10px; animation: float 15s ease-in-out infinite reverse; }
+    .cloud-3 { width: 100px; height: 35px; top: 60%; left: 10%; animation: float 18s ease-in-out infinite; }
+    @keyframes float { 0%, 100% { transform: translateX(0); } 50% { transform: translateX(30px); } }
+    
+    /* Grass at bottom */
+    .grass {
+      position: fixed; bottom: 0; left: 0; right: 0; height: 60px;
+      background: linear-gradient(180deg, transparent 0%, #8BB174 20%, #6B9B54 100%);
+      z-index: 0;
+    }
+    .grass::before {
+      content: '🌱 🌿 🌸 🌼 🌱 🌿 🌸 🌱 🌿 🌼';
+      position: absolute; top: 10px; left: 0; right: 0;
+      font-size: 16px; letter-spacing: 8px; text-align: center;
+    }
+    
+    /* Header */
+    .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+    .back-btn {
+      width: 48px; height: 48px; border-radius: 50%; 
+      background: rgba(255,255,255,0.8); backdrop-filter: blur(10px);
+      border: none; cursor: pointer; display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 4px 15px rgba(107,155,84,0.2);
+    }
+    .back-btn svg { width: 22px; height: 22px; color: #5B8C4A; }
+    
+    .star-counter {
+      display: flex; align-items: center; gap: 8px; padding: 10px 20px;
+      background: rgba(255,255,255,0.85); backdrop-filter: blur(10px);
+      border-radius: 30px; box-shadow: 0 4px 15px rgba(107,155,84,0.2);
+    }
+    .star-counter .soot { font-size: 28px; }
+    .star-counter span { font-size: 24px; font-weight: 800; color: #4A6741; }
+    
+    /* Greeting */
+    .greeting { text-align: center; margin-bottom: 24px; }
+    .greeting .spirits { font-size: 32px; margin-bottom: 8px; letter-spacing: 4px; }
+    .greeting h1 { font-size: 32px; font-weight: 800; color: #3D5A35; margin-bottom: 4px; }
+    .greeting p { font-size: 17px; color: #6B8B5E; font-weight: 600; }
+    
+    /* Progress Card - like a wooden sign */
+    .progress-card {
+      background: linear-gradient(135deg, #F5E6D3 0%, #E8D4BC 100%);
+      border-radius: 20px; padding: 20px; margin-bottom: 24px;
+      box-shadow: 0 8px 25px rgba(107,155,84,0.2);
+      border: 3px solid #C9B896;
+      position: relative;
+    }
+    .progress-card::before {
+      content: '🍃';
+      position: absolute; top: -10px; right: 20px; font-size: 24px;
+    }
+    .progress-content { display: flex; justify-content: space-between; align-items: center; }
+    .progress-text .label { font-size: 12px; font-weight: 700; color: #8B7355; text-transform: uppercase; letter-spacing: 1px; }
+    .progress-text .value { font-size: 36px; font-weight: 800; color: #5B4A3A; }
+    .progress-text .value span { font-size: 20px; color: #8B7355; }
+    .totoro { font-size: 50px; opacity: 0.9; }
+    .success-msg { font-size: 13px; font-weight: 700; color: #6B9B54; margin-top: 8px; }
+    
+    /* Section */
+    .section { margin-bottom: 20px; }
+    .section-header { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+    .section-header .leaf { font-size: 20px; }
+    .section-header h2 { font-size: 18px; font-weight: 800; color: #3D5A35; }
+    .section-header .subtitle { font-size: 13px; color: #6B8B5E; font-weight: 600; }
+    
+    /* Quest Cards - soft watercolor feel */
+    .quest-card {
+      padding: 14px 16px; margin-bottom: 10px; cursor: pointer;
+      background: rgba(255,255,255,0.85); backdrop-filter: blur(5px);
+      border-radius: 16px;
+      box-shadow: 0 4px 15px rgba(107,155,84,0.12);
+      transition: all 0.3s ease;
+    }
+    .quest-card:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(107,155,84,0.2); }
+    .quest-card.completed { background: linear-gradient(135deg, rgba(139,177,116,0.3) 0%, rgba(107,155,84,0.2) 100%); }
+    
+    .quest-content { display: flex; align-items: center; gap: 14px; }
+    .quest-icon { 
+      width: 40px; height: 40px; border-radius: 50%; 
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px; flex-shrink: 0;
+    }
+    .quest-icon.done { background: #8BB174; }
+    .quest-icon.todo { background: rgba(139,177,116,0.2); }
+    .quest-text h3 { font-size: 16px; font-weight: 700; color: #3D5A35; }
+    .quest-text h3.done { text-decoration: line-through; opacity: 0.6; }
+    .quest-text p { font-size: 13px; color: #6B8B5E; margin-top: 2px; }
+    .pending { font-size: 11px; color: #B8860B; font-weight: 700; margin-top: 4px; }
+    
+    /* Bonus */
+    .bonus .quest-card { border: 2px dashed rgba(139,177,116,0.4); background: rgba(255,255,255,0.6); }
+    
+    /* Buttons */
+    .store-btn {
+      width: 100%; padding: 16px 24px; font-size: 17px; font-weight: 800;
+      background: linear-gradient(135deg, #8BB174 0%, #6B9B54 100%);
+      color: white; border: none; border-radius: 30px;
+      cursor: pointer; margin-bottom: 12px;
+      box-shadow: 0 6px 20px rgba(107,155,84,0.3);
+    }
+    .switch-btn {
+      width: 100%; padding: 14px 24px; font-size: 15px; font-weight: 700;
+      background: rgba(255,255,255,0.7); color: #5B8C4A; 
+      border: none; border-radius: 30px; cursor: pointer;
+    }
+    
+    /* Footer spirits */
+    .footer-spirits { text-align: center; margin-top: 24px; font-size: 24px; letter-spacing: 8px; margin-bottom: 60px; }
+  </style>
+</head>
+<body>
+  <div class="cloud cloud-1"></div>
+  <div class="cloud cloud-2"></div>
+  <div class="cloud cloud-3"></div>
+  <div class="grass"></div>
+  
+  <div class="container">
+    <!-- Header -->
+    <div class="header">
+      <button class="back-btn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      </button>
+      <div class="star-counter">
+        <span class="soot">⭐</span>
+        <span>24</span>
+      </div>
+    </div>
+    
+    <!-- Greeting -->
+    <div class="greeting">
+      <div class="spirits">🌸 🦊 🌸</div>
+      <h1>Hello Zen!</h1>
+      <p>A gentle day awaits you ✨</p>
+    </div>
+    
+    <!-- Progress Card -->
+    <div class="progress-card">
+      <div class="progress-content">
+        <div class="progress-text">
+          <div class="label">Today's Journey</div>
+          <div class="value">2 <span>of 3</span></div>
+        </div>
+        <div class="totoro">🦉</div>
+      </div>
+    </div>
+    
+    <!-- Must Do Section -->
+    <div class="section">
+      <div class="section-header">
+        <span class="leaf">🌿</span>
+        <h2>Daily Tasks</h2>
+      </div>
+      
+      <div class="quest-card completed">
+        <div class="quest-content">
+          <div class="quest-icon done">✨</div>
+          <div class="quest-text">
+            <h3 class="done">Brush teeth</h3>
+            <p>Morning and night!</p>
+          </div>
+        </div>
+      </div>
+      
+      <div class="quest-card completed">
+        <div class="quest-content">
+          <div class="quest-icon done">✨</div>
+          <div class="quest-text">
+            <h3 class="done">Make bed</h3>
+            <p>Nice and tidy!</p>
+            <div class="pending">Waiting for grown-up 🍃</div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="quest-card">
+        <div class="quest-content">
+          <div class="quest-icon todo">📖</div>
+          <div class="quest-text">
+            <h3>Read for 15 min</h3>
+            <p>Any book you like!</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Bonus Section -->
+    <div class="section bonus">
+      <div class="section-header">
+        <span class="leaf">🌟</span>
+        <h2>Bonus Quests</h2>
+        <span class="subtitle">(+1 star!)</span>
+      </div>
+      
+      <div class="quest-card">
+        <div class="quest-content">
+          <div class="quest-icon todo">🍽️</div>
+          <div class="quest-text">
+            <h3>Help with dishes</h3>
+            <p>Be a kitchen hero!</p>
+          </div>
+        </div>
+      </div>
+      
+      <div class="quest-card">
+        <div class="quest-content">
+          <div class="quest-icon todo">🎹</div>
+          <div class="quest-text">
+            <h3>Practice piano</h3>
+            <p>10 minutes of music!</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Buttons -->
+    <button class="store-btn">🛒 Visit Star Store</button>
+    <button class="switch-btn">Switch Friend</button>
+    
+    <!-- Footer -->
+    <div class="footer-spirits">🌸 🍃 🌸</div>
+  </div>
+</body>
+</html>

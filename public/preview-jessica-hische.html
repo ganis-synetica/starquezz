@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <title>Starquezz - Jessica Hische Style</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Crimson+Pro:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Crimson Pro', Georgia, serif;
+      background: linear-gradient(180deg, #FFF8F0 0%, #FEF3E8 100%);
+      min-height: 100vh;
+      padding: 20px;
+      color: #2D2A26;
+    }
+    .container { max-width: 400px; margin: 0 auto; }
+    
+    /* Decorative flourishes */
+    .flourish { color: #C4956A; font-size: 24px; letter-spacing: 8px; }
+    
+    /* Header */
+    .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
+    .back-btn {
+      width: 44px; height: 44px; border-radius: 50%; background: transparent;
+      border: 2px solid #C4956A; cursor: pointer; display: flex; align-items: center; justify-content: center;
+    }
+    .back-btn svg { width: 20px; height: 20px; color: #C4956A; }
+    
+    .star-counter {
+      display: flex; align-items: center; gap: 8px; padding: 8px 20px;
+      background: #2D2A26; border-radius: 30px;
+    }
+    .star-counter svg { width: 24px; height: 24px; fill: #C4956A; }
+    .star-counter span { font-family: 'Playfair Display', serif; font-size: 24px; font-weight: 700; color: #FFF8F0; }
+    
+    /* Greeting */
+    .greeting { text-align: center; margin-bottom: 32px; }
+    .greeting .flourish { margin-bottom: 8px; }
+    .greeting h1 { 
+      font-family: 'Playfair Display', serif; font-size: 42px; font-weight: 900; 
+      color: #2D2A26; line-height: 1.1; margin-bottom: 8px;
+      font-style: italic;
+    }
+    .greeting h1 span { color: #C4956A; font-style: normal; }
+    .greeting p { font-size: 18px; color: #6B635A; font-style: italic; }
+    
+    /* Progress Card */
+    .progress-card {
+      background: #2D2A26; border-radius: 16px; padding: 24px; margin-bottom: 32px;
+      position: relative; overflow: hidden;
+    }
+    .progress-card::before {
+      content: '✦ ✦ ✦';
+      position: absolute; top: 12px; right: 16px;
+      color: #C4956A; font-size: 10px; letter-spacing: 4px;
+    }
+    .progress-card .label { font-size: 11px; text-transform: uppercase; letter-spacing: 3px; color: #C4956A; margin-bottom: 4px; }
+    .progress-card .value { font-family: 'Playfair Display', serif; font-size: 48px; font-weight: 900; color: #FFF8F0; }
+    .progress-card .value span { color: #C4956A; font-size: 24px; }
+    .progress-card .trophy { position: absolute; bottom: 16px; right: 20px; font-size: 40px; opacity: 0.3; }
+    
+    /* Section */
+    .section { margin-bottom: 28px; }
+    .section-header { 
+      display: flex; align-items: center; gap: 12px; margin-bottom: 16px;
+      padding-bottom: 8px; border-bottom: 1px solid #E8DDD4;
+    }
+    .section-header h2 { 
+      font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 700;
+      font-style: italic;
+    }
+    .section-header .subtitle { font-size: 14px; color: #9B8F82; }
+    
+    /* Quest Cards */
+    .quest-card {
+      padding: 16px 20px; margin-bottom: 12px; cursor: pointer;
+      background: white; border-radius: 12px;
+      border: 1px solid #E8DDD4;
+      transition: all 0.2s;
+    }
+    .quest-card:hover { border-color: #C4956A; box-shadow: 0 4px 12px rgba(196,149,106,0.15); }
+    .quest-card.completed { background: #F8F5F1; border-color: #C4956A; }
+    
+    .quest-content { display: flex; align-items: center; gap: 16px; }
+    .quest-icon { 
+      width: 36px; height: 36px; border-radius: 50%; 
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px; flex-shrink: 0;
+    }
+    .quest-icon.done { background: #C4956A; color: white; }
+    .quest-icon.todo { background: #F8F5F1; border: 2px solid #E8DDD4; }
+    .quest-text h3 { font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 600; }
+    .quest-text h3.done { text-decoration: line-through; color: #9B8F82; }
+    .quest-text p { font-size: 14px; color: #9B8F82; font-style: italic; margin-top: 2px; }
+    .pending { font-size: 12px; color: #C4956A; margin-top: 4px; font-style: italic; }
+    
+    /* Bonus Section */
+    .bonus .quest-card { border-style: dashed; }
+    
+    /* Buttons */
+    .store-btn {
+      width: 100%; padding: 16px 24px; font-family: 'Playfair Display', serif;
+      font-size: 18px; font-weight: 700; font-style: italic;
+      background: #C4956A; color: white; border: none; border-radius: 30px;
+      cursor: pointer; margin-bottom: 12px;
+      transition: background 0.2s;
+    }
+    .store-btn:hover { background: #B5865B; }
+    .switch-btn {
+      width: 100%; padding: 14px 24px; font-size: 16px;
+      background: transparent; color: #6B635A; 
+      border: 1px solid #E8DDD4; border-radius: 30px; cursor: pointer;
+    }
+    
+    /* Footer flourish */
+    .footer-flourish { text-align: center; margin-top: 32px; color: #C4956A; font-size: 14px; letter-spacing: 6px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Header -->
+    <div class="header">
+      <button class="back-btn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      </button>
+      <div class="star-counter">
+        <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        <span>24</span>
+      </div>
+    </div>
+    
+    <!-- Greeting -->
+    <div class="greeting">
+      <div class="flourish">✦ ✦ ✦</div>
+      <h1>Hello, <span>Zen</span>!</h1>
+      <p>What shall we accomplish today?</p>
+    </div>
+    
+    <!-- Progress Card -->
+    <div class="progress-card">
+      <div class="label">Today's Progress</div>
+      <div class="value">2 <span>of 3</span></div>
+      <div class="trophy">🏆</div>
+    </div>
+    
+    <!-- Must Do Section -->
+    <div class="section">
+      <div class="section-header">
+        <h2>Daily Essentials</h2>
+      </div>
+      
+      <div class="quest-card completed">
+        <div class="quest-content">
+          <div class="quest-icon done">✓</div>
+          <div class="quest-text">
+            <h3 class="done">Brush teeth</h3>
+            <p>Morning and night!</p>
+          </div>
+        </div>
+      </div>
+      
+      <div class="quest-card completed">
+        <div class="quest-content">
+          <div class="quest-icon done">✓</div>
+          <div class="quest-text">
+            <h3 class="done">Make bed</h3>
+            <p>Nice and tidy!</p>
+            <div class="pending">Awaiting approval ✦</div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="quest-card">
+        <div class="quest-content">
+          <div class="quest-icon todo">○</div>
+          <div class="quest-text">
+            <h3>Read for 15 min</h3>
+            <p>Any book you like!</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Bonus Section -->
+    <div class="section bonus">
+      <div class="section-header">
+        <h2>Extra Credit</h2>
+        <span class="subtitle">+1 star each</span>
+      </div>
+      
+      <div class="quest-card">
+        <div class="quest-content">
+          <div class="quest-icon todo">✧</div>
+          <div class="quest-text">
+            <h3>Help with dishes</h3>
+            <p>Be a kitchen hero!</p>
+          </div>
+        </div>
+      </div>
+      
+      <div class="quest-card">
+        <div class="quest-content">
+          <div class="quest-icon todo">✧</div>
+          <div class="quest-text">
+            <h3>Practice piano</h3>
+            <p>10 minutes of music!</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Buttons -->
+    <button class="store-btn">✦ Visit the Star Shop ✦</button>
+    <button class="switch-btn">Switch Profile</button>
+    
+    <!-- Footer -->
+    <div class="footer-flourish">✦ ✦ ✦</div>
+  </div>
+</body>
+</html>

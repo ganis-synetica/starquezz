@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <title>Starquezz - Eric Carle Style Preview</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'DM Sans', system-ui, -apple-system, sans-serif;
+      background-color: #FDF6E3;
+      background-image: 
+        radial-gradient(ellipse at 20% 80%, rgba(45,106,79,0.08) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 20%, rgba(230,57,70,0.06) 0%, transparent 40%),
+        radial-gradient(ellipse at 50% 50%, rgba(255,214,10,0.05) 0%, transparent 60%);
+      min-height: 100vh;
+      padding: 16px;
+    }
+    .container { max-width: 400px; margin: 0 auto; }
+    
+    /* Header */
+    .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px; }
+    .back-btn {
+      width: 48px; height: 48px; border-radius: 50%; background: #457B9D;
+      border: none; cursor: pointer; display: flex; align-items: center; justify-content: center;
+      box-shadow: 4px 4px 0 rgba(0,0,0,0.2); transform: rotate(-5deg);
+    }
+    .back-btn svg { width: 24px; height: 24px; color: white; }
+    
+    .star-counter {
+      position: relative; padding: 12px 24px; display: flex; align-items: center; gap: 12px;
+      background: #FFD60A; border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+      box-shadow: 6px 6px 0 rgba(0,0,0,0.15); transform: rotate(3deg);
+    }
+    .star-counter::before { content: ''; position: absolute; top: -8px; left: -8px; width: 16px; height: 16px; background: #F77F00; border-radius: 50%; }
+    .star-counter::after { content: ''; position: absolute; top: -12px; right: 16px; width: 12px; height: 12px; background: #F77F00; border-radius: 50%; }
+    .star-counter span { font-size: 28px; font-weight: 900; color: #8B4513; }
+    
+    /* Greeting */
+    .greeting { text-align: center; margin-bottom: 32px; }
+    .caterpillar-dots { display: flex; justify-content: center; gap: 4px; margin-bottom: 12px; }
+    .dot { width: 16px; height: 16px; border-radius: 50%; }
+    .greeting h1 { font-size: 32px; font-weight: 900; color: #2D6A4F; text-shadow: 3px 3px 0 rgba(0,0,0,0.1); transform: rotate(-1deg); margin-bottom: 8px; }
+    .greeting p { font-size: 18px; font-weight: 700; color: #8B4513; }
+    
+    /* Progress Card */
+    .progress-card {
+      background: #457B9D; border-radius: 30px 10px 30px 10px;
+      box-shadow: 8px 8px 0 rgba(0,0,0,0.15); transform: rotate(0.5deg);
+      padding: 20px; margin-bottom: 32px; position: relative; overflow: hidden;
+    }
+    .progress-card .torn-edge {
+      position: absolute; top: 0; left: 0; right: 0; height: 12px;
+      background: linear-gradient(90deg, transparent 0%, #FDF6E3 5%, transparent 10%, #FDF6E3 20%, transparent 25%, #FDF6E3 40%, transparent 45%, #FDF6E3 60%, transparent 65%, #FDF6E3 80%, transparent 85%, #FDF6E3 95%, transparent 100%);
+    }
+    .progress-content { display: flex; justify-content: space-between; align-items: center; }
+    .progress-text p:first-child { font-size: 12px; font-weight: 700; color: rgba(255,255,255,0.8); text-transform: uppercase; letter-spacing: 1px; }
+    .progress-text p:last-child { font-size: 28px; font-weight: 900; color: white; margin-top: 4px; }
+    .trophy-circle { width: 64px; height: 64px; border-radius: 50%; background: #FFD60A; display: flex; align-items: center; justify-content: center; transform: rotate(10deg); }
+    .success-msg { font-size: 13px; font-weight: 700; background: #FFD60A; color: #8B4513; padding: 8px; border-radius: 50px; text-align: center; margin-top: 12px; }
+    
+    /* Section Headers */
+    .section-header { display: flex; align-items: center; gap: 8px; margin-bottom: 16px; }
+    .section-header .icon { width: 32px; height: 32px; border-radius: 50%; color: white; display: flex; align-items: center; justify-content: center; font-size: 14px; }
+    .section-header h2 { font-size: 20px; font-weight: 900; }
+    .section-header .subtitle { font-size: 13px; font-weight: 400; color: rgba(139,69,19,0.5); }
+    
+    /* Quest Cards */
+    .quest-card {
+      padding: 16px; margin-bottom: 16px; cursor: pointer;
+      box-shadow: 5px 5px 0 rgba(0,0,0,0.12);
+      transition: transform 0.1s;
+    }
+    .quest-card:hover { transform: scale(1.02); }
+    .quest-card.completed { background: #2D6A4F; }
+    .quest-card.todo { background: white; }
+    .quest-card:nth-child(odd) { border-radius: 20px 8px 20px 8px; transform: rotate(-0.5deg); }
+    .quest-card:nth-child(even) { border-radius: 8px 20px 8px 20px; transform: rotate(0.5deg); }
+    
+    .quest-content { display: flex; align-items: center; gap: 16px; }
+    .quest-icon { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; border: 3px solid rgba(139,69,19,0.2); }
+    .quest-icon.done { background: white; }
+    .quest-icon.todo { background: #FFD60A; }
+    .quest-text h3 { font-size: 17px; font-weight: 700; }
+    .quest-text h3.done { text-decoration: line-through; color: white; }
+    .quest-text h3.todo { color: #8B4513; }
+    .quest-text p { font-size: 13px; }
+    .quest-text p.done { color: rgba(255,255,255,0.8); }
+    .quest-text p.todo { color: rgba(139,69,19,0.6); }
+    .pending { font-size: 11px; font-weight: 700; color: #F77F00; margin-top: 4px; }
+    
+    /* Bonus Cards */
+    .bonus-card { border: 4px dashed rgba(123,44,191,0.27); }
+    .bonus-card.completed { background: #7B2CBF; border-color: #7B2CBF; }
+    
+    /* Buttons */
+    .store-btn {
+      width: 100%; padding: 16px 24px; font-size: 20px; font-weight: 900;
+      background: #E63946; color: white; border: none; border-radius: 50px;
+      box-shadow: 6px 6px 0 rgba(0,0,0,0.2); transform: rotate(-0.5deg);
+      cursor: pointer; margin-bottom: 16px;
+    }
+    .switch-btn {
+      width: 100%; padding: 12px 24px; font-size: 17px; font-weight: 700;
+      background: transparent; color: #8B4513; border: 3px solid rgba(139,69,19,0.27);
+      border-radius: 50px; cursor: pointer;
+    }
+    
+    /* Bottom decoration */
+    .bottom-dots { display: flex; justify-content: center; gap: 8px; margin-top: 32px; margin-bottom: 16px; }
+    .bottom-dots .dot { width: 12px; height: 12px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Header -->
+    <div class="header">
+      <button class="back-btn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      </button>
+      <div class="star-counter">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="#F77F00" stroke="#F77F00"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        <span>24</span>
+      </div>
+    </div>
+    
+    <!-- Greeting -->
+    <div class="greeting">
+      <div class="caterpillar-dots">
+        <div class="dot" style="background:#E63946"></div>
+        <div class="dot" style="background:#F77F00;transform:translateY(2px)"></div>
+        <div class="dot" style="background:#FFD60A"></div>
+        <div class="dot" style="background:#2D6A4F;transform:translateY(-2px)"></div>
+        <div class="dot" style="background:#457B9D"></div>
+        <div class="dot" style="background:#7B2CBF;transform:translateY(2px)"></div>
+      </div>
+      <h1>Hello Zen!</h1>
+      <p>🦖 What will you do today?</p>
+    </div>
+    
+    <!-- Progress Card -->
+    <div class="progress-card">
+      <div class="torn-edge"></div>
+      <div class="progress-content">
+        <div class="progress-text">
+          <p>TODAY'S JOURNEY</p>
+          <p>2 of 3</p>
+        </div>
+        <div class="trophy-circle">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#F77F00" stroke-width="2"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6M18 9h1.5a2.5 2.5 0 0 0 0-5H18M4 22h16M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20 7 22M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20 17 22M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Must Do Section -->
+    <div class="section">
+      <div class="section-header">
+        <div class="icon" style="background:#2D6A4F">✓</div>
+        <h2 style="color:#2D6A4F">Must Do</h2>
+      </div>
+      
+      <div class="quest-card completed" style="border-radius:20px 8px 20px 8px;transform:rotate(-0.5deg)">
+        <div class="quest-content">
+          <div class="quest-icon done">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#2D6A4F" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+          <div class="quest-text">
+            <h3 class="done">Brush teeth</h3>
+            <p class="done">Morning and night!</p>
+          </div>
+        </div>
+      </div>
+      
+      <div class="quest-card completed" style="border-radius:8px 20px 8px 20px;transform:rotate(0.5deg)">
+        <div class="quest-content">
+          <div class="quest-icon done">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#2D6A4F" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+          <div class="quest-text">
+            <h3 class="done">Make bed</h3>
+            <p class="done">Nice and tidy!</p>
+            <div class="pending">Waiting for grown-up ⏳</div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="quest-card todo" style="border-radius:20px 8px 20px 8px;transform:rotate(-0.5deg);border:4px solid rgba(139,69,19,0.13)">
+        <div class="quest-content">
+          <div class="quest-icon todo">🐛</div>
+          <div class="quest-text">
+            <h3 class="todo">Read for 15 min</h3>
+            <p class="todo">Any book you like!</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Bonus Section -->
+    <div class="section" style="margin-top:24px">
+      <div class="section-header">
+        <div class="icon" style="background:#7B2CBF">★</div>
+        <h2 style="color:#7B2CBF">Bonus Fun</h2>
+        <span class="subtitle">(+1 star!)</span>
+      </div>
+      
+      <div class="quest-card bonus-card todo" style="border-radius:8px 24px 8px 24px;transform:rotate(0.5deg)">
+        <div class="quest-content">
+          <div class="quest-icon" style="background:#F77F00;border-color:rgba(139,69,19,0.2)">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          </div>
+          <div class="quest-text">
+            <h3 class="todo">Help with dishes</h3>
+            <p class="todo">Be a kitchen hero!</p>
+          </div>
+        </div>
+      </div>
+      
+      <div class="quest-card bonus-card todo" style="border-radius:24px 8px 24px 8px;transform:rotate(-0.5deg)">
+        <div class="quest-content">
+          <div class="quest-icon" style="background:#F77F00;border-color:rgba(139,69,19,0.2)">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          </div>
+          <div class="quest-text">
+            <h3 class="todo">Practice piano</h3>
+            <p class="todo">10 minutes of music!</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Buttons -->
+    <button class="store-btn" style="margin-top:24px">🛒 Visit Star Store!</button>
+    <button class="switch-btn">Switch Friend</button>
+    
+    <!-- Bottom decoration -->
+    <div class="bottom-dots">
+      <div class="dot" style="background:#2D6A4F"></div>
+      <div class="dot" style="background:#FFD60A;transform:translateY(3px)"></div>
+      <div class="dot" style="background:#E63946"></div>
+      <div class="dot" style="background:#F77F00;transform:translateY(-2px)"></div>
+      <div class="dot" style="background:#457B9D"></div>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <title>Starquezz - Oliver Jeffers Style</title>
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background: #FAFAFA;
+      min-height: 100vh;
+      padding: 24px;
+      color: #1a1a1a;
+    }
+    .container { max-width: 380px; margin: 0 auto; }
+    
+    /* Handwritten font */
+    .handwritten { font-family: 'Caveat', cursive; }
+    
+    /* Sketchy underline */
+    .sketch-underline {
+      position: relative;
+      display: inline-block;
+    }
+    .sketch-underline::after {
+      content: '';
+      position: absolute;
+      bottom: -4px; left: 0; right: 0; height: 3px;
+      background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 10'%3E%3Cpath d='M0 5 Q25 2, 50 5 T100 5' stroke='%23E85D4C' fill='none' stroke-width='2'/%3E%3C/svg%3E") repeat-x;
+    }
+    
+    /* Header */
+    .header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 40px; }
+    .back-btn {
+      width: 40px; height: 40px; background: none;
+      border: 2px solid #1a1a1a; border-radius: 50%;
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+    }
+    .back-btn svg { width: 18px; height: 18px; }
+    
+    .star-counter {
+      text-align: right;
+    }
+    .star-counter .label { font-family: 'Caveat', cursive; font-size: 14px; color: #666; }
+    .star-counter .value { font-family: 'Caveat', cursive; font-size: 48px; font-weight: 700; color: #E85D4C; line-height: 1; }
+    .star-counter .stars { font-size: 12px; letter-spacing: 2px; }
+    
+    /* Greeting */
+    .greeting { margin-bottom: 48px; }
+    .greeting h1 { 
+      font-family: 'Caveat', cursive; font-size: 52px; font-weight: 700; 
+      line-height: 1; margin-bottom: 8px;
+    }
+    .greeting h1 .name { color: #E85D4C; }
+    .greeting p { font-size: 15px; color: #666; }
+    .greeting .arrow { font-size: 24px; margin-top: 8px; color: #E85D4C; }
+    
+    /* Progress - minimal sketch style */
+    .progress { margin-bottom: 48px; padding-left: 20px; border-left: 3px solid #1a1a1a; }
+    .progress .label { font-family: 'Caveat', cursive; font-size: 18px; color: #666; margin-bottom: 4px; }
+    .progress .fraction { font-size: 14px; display: flex; align-items: baseline; gap: 4px; }
+    .progress .fraction .big { font-family: 'Caveat', cursive; font-size: 64px; font-weight: 700; line-height: 1; }
+    .progress .fraction .small { font-size: 14px; color: #666; }
+    .progress .note { font-family: 'Caveat', cursive; font-size: 16px; color: #E85D4C; margin-top: 8px; }
+    
+    /* Section */
+    .section { margin-bottom: 36px; }
+    .section-header { margin-bottom: 16px; }
+    .section-header h2 { 
+      font-family: 'Caveat', cursive; font-size: 28px; font-weight: 600;
+      display: inline;
+    }
+    .section-header .subtitle { font-size: 13px; color: #999; margin-left: 8px; }
+    
+    /* Quest Cards - minimal, sketch-like */
+    .quest-card {
+      padding: 16px 0; cursor: pointer;
+      border-bottom: 1px dashed #ddd;
+      transition: all 0.2s;
+    }
+    .quest-card:hover { padding-left: 8px; }
+    .quest-card:last-child { border-bottom: none; }
+    
+    .quest-content { display: flex; align-items: flex-start; gap: 16px; }
+    .quest-icon { 
+      width: 28px; height: 28px; 
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Caveat', cursive; font-size: 24px; flex-shrink: 0;
+      margin-top: 2px;
+    }
+    .quest-icon.done { color: #E85D4C; }
+    .quest-icon.todo { color: #ccc; }
+    .quest-text h3 { font-size: 16px; font-weight: 500; margin-bottom: 2px; }
+    .quest-text h3.done { text-decoration: line-through; color: #999; }
+    .quest-text p { font-size: 13px; color: #999; }
+    .pending { font-family: 'Caveat', cursive; font-size: 15px; color: #E85D4C; margin-top: 4px; }
+    
+    /* Bonus */
+    .bonus .quest-card { opacity: 0.7; }
+    .bonus .quest-card:hover { opacity: 1; }
+    
+    /* Buttons */
+    .store-btn {
+      width: 100%; padding: 16px 24px; 
+      font-family: 'Caveat', cursive; font-size: 24px; font-weight: 600;
+      background: #1a1a1a; color: white; border: none; border-radius: 8px;
+      cursor: pointer; margin-bottom: 12px;
+    }
+    .switch-btn {
+      width: 100%; padding: 14px 24px; 
+      font-family: 'Caveat', cursive; font-size: 20px;
+      background: none; color: #666; 
+      border: 2px dashed #ddd; border-radius: 8px; cursor: pointer;
+    }
+    
+    /* Doodle */
+    .doodle { text-align: center; margin-top: 32px; font-family: 'Caveat', cursive; font-size: 16px; color: #ccc; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Header -->
+    <div class="header">
+      <button class="back-btn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      </button>
+      <div class="star-counter">
+        <div class="label">stars collected</div>
+        <div class="value">24</div>
+        <div class="stars">★ ★ ★</div>
+      </div>
+    </div>
+    
+    <!-- Greeting -->
+    <div class="greeting">
+      <h1>hello <span class="name">Zen</span>,</h1>
+      <p>here's what we're doing today</p>
+      <div class="arrow">↓</div>
+    </div>
+    
+    <!-- Progress -->
+    <div class="progress">
+      <div class="label">progress so far</div>
+      <div class="fraction">
+        <span class="big">2</span>
+        <span class="small">out of 3 things</span>
+      </div>
+      <div class="note">almost there!</div>
+    </div>
+    
+    <!-- Must Do Section -->
+    <div class="section">
+      <div class="section-header">
+        <h2 class="sketch-underline">the important stuff</h2>
+      </div>
+      
+      <div class="quest-card">
+        <div class="quest-content">
+          <div class="quest-icon done">✗</div>
+          <div class="quest-text">
+            <h3 class="done">brush teeth</h3>
+            <p>morning and night</p>
+          </div>
+        </div>
+      </div>
+      
+      <div class="quest-card">
+        <div class="quest-content">
+          <div class="quest-icon done">✗</div>
+          <div class="quest-text">
+            <h3 class="done">make bed</h3>
+            <p>nice and tidy</p>
+            <div class="pending">→ waiting for grown-up</div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="quest-card">
+        <div class="quest-content">
+          <div class="quest-icon todo">○</div>
+          <div class="quest-text">
+            <h3>read for 15 min</h3>
+            <p>any book you like</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Bonus Section -->
+    <div class="section bonus">
+      <div class="section-header">
+        <h2>extra things</h2>
+        <span class="subtitle">(+1 star each)</span>
+      </div>
+      
+      <div class="quest-card">
+        <div class="quest-content">
+          <div class="quest-icon todo">○</div>
+          <div class="quest-text">
+            <h3>help with dishes</h3>
+            <p>kitchen hero stuff</p>
+          </div>
+        </div>
+      </div>
+      
+      <div class="quest-card">
+        <div class="quest-content">
+          <div class="quest-icon todo">○</div>
+          <div class="quest-text">
+            <h3>practice piano</h3>
+            <p>10 minutes</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Buttons -->
+    <button class="store-btn">go to star store →</button>
+    <button class="switch-btn">switch profile</button>
+    
+    <!-- Doodle -->
+    <div class="doodle">~ made with love ~</div>
+  </div>
+</body>
+</html>
