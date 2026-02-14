@@ -33,9 +33,9 @@
 
 ### 🟡 Parent Experience  
 - [ ] Weekly progress summary email
-- [ ] Edit/delete habits from dashboard
+- [x] Edit/delete habits from dashboard
 - [ ] Bulk approve pending items
-- [ ] Redemption fulfillment queue
+- [x] Redemption fulfillment queue (merged with approvals)
 
 ---
 

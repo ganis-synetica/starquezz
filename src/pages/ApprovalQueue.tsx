@@ -5,7 +5,8 @@ import { useAuth } from '@/contexts/AuthContext'
 import { supabase } from '@/lib/supabase'
 import { awardStarsIfNeeded, approveCompletion, listPendingApprovals, rejectCompletion } from '@/services/completions'
 import { listPendingRedemptions, fulfillRedemption, cancelRedemption, type RedemptionWithDetails } from '@/services/redemptions'
-import type { Child, Reward } from '@/types'
+import { updateHabit, disableHabit } from '@/services/habits'
+import type { Child, Reward, Habit } from '@/types'
 import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Star, Pencil, Trash2, Plus, Check, X, Gift, ShoppingBag } from 'lucide-react'
@@ -21,7 +22,9 @@ function dateISOFromTimestamp(ts: string) {
   return `${yyyy}-${mm}-${dd}`
 }
 
-type Tab = 'approvals' | 'rewards' | 'children'
+type Tab = 'approvals' | 'habits' | 'rewards' | 'children'
+
+type HabitWithChild = Habit & { child: Pick<Child, 'id' | 'name' | 'avatar'> }
 
 const AVATARS = ['🦊', '🦋', '🐱', '🐶', '🦁', '🐰', '🐼', '🦝', '🦄', '🐸']
 
@@ -35,8 +38,16 @@ export function ApprovalQueue() {
   const [childrenById, setChildrenById] = useState<Record<string, ChildWithStars>>({})
   const [children, setChildren] = useState<ChildWithStars[]>([])
   const [rewards, setRewards] = useState<Reward[]>([])
+  const [habits, setHabits] = useState<HabitWithChild[]>([])
   const [error, setError] = useState<string | null>(null)
   const [busyId, setBusyId] = useState<string | null>(null)
+  
+  // Habit editing
+  const [editingHabitId, setEditingHabitId] = useState<string | null>(null)
+  const [editHabitTitle, setEditHabitTitle] = useState('')
+  const [editHabitDescription, setEditHabitDescription] = useState('')
+  const [editHabitIsCore, setEditHabitIsCore] = useState(true)
+  const [selectedChildFilter, setSelectedChildFilter] = useState<string>('all')
 
   // Reward editing
   const [editingRewardId, setEditingRewardId] = useState<string | null>(null)
@@ -64,15 +75,17 @@ export function ApprovalQueue() {
 
     void (async () => {
       setError(null)
-      const [pending, pendingRedemptions, childrenRes, rewardsRes] = await Promise.all([
+      const [pending, pendingRedemptions, childrenRes, rewardsRes, habitsRes] = await Promise.all([
         listPendingApprovals(),
         listPendingRedemptions(),
         supabase.from('children').select('id,name,avatar,stars'),
         supabase.from('rewards').select('*').eq('parent_id', parentId).eq('active', true).order('star_cost'),
+        supabase.from('habits').select('*, child:children(id,name,avatar)').eq('parent_id', parentId).eq('active', true).order('created_at'),
       ])
 
       if (childrenRes.error) throw childrenRes.error
       if (rewardsRes.error) throw rewardsRes.error
+      if (habitsRes.error) throw habitsRes.error
 
       const childList = (childrenRes.data ?? []) as ChildWithStars[]
       const map: Record<string, ChildWithStars> = {}
@@ -84,6 +97,7 @@ export function ApprovalQueue() {
       setRows(pending)
       setRedemptions(pendingRedemptions)
       setRewards((rewardsRes.data ?? []) as Reward[])
+      setHabits((habitsRes.data ?? []) as HabitWithChild[])
     })().catch((err) => {
       setError(err instanceof Error ? err.message : 'Could not load data.')
     })
@@ -326,6 +340,58 @@ export function ApprovalQueue() {
     return `${parts.join(' and ')} waiting for your OK!`
   }, [totalCount, habitCount, redemptionCount])
 
+  // Habit CRUD
+  const startEditHabit = (habit: HabitWithChild) => {
+    setEditingHabitId(habit.id)
+    setEditHabitTitle(habit.title)
+    setEditHabitDescription(habit.description ?? '')
+    setEditHabitIsCore(habit.is_core)
+  }
+
+  const cancelEditHabit = () => {
+    setEditingHabitId(null)
+    setEditHabitTitle('')
+    setEditHabitDescription('')
+    setEditHabitIsCore(true)
+  }
+
+  const saveHabit = async (habitId: string) => {
+    if (!editHabitTitle.trim()) return
+    setError(null)
+    try {
+      await updateHabit(habitId, {
+        title: editHabitTitle.trim(),
+        description: editHabitDescription.trim() || undefined,
+        is_core: editHabitIsCore,
+      })
+      setHabits(prev => prev.map(h => h.id === habitId ? {
+        ...h,
+        title: editHabitTitle.trim(),
+        description: editHabitDescription.trim() || undefined,
+        is_core: editHabitIsCore,
+      } : h))
+      cancelEditHabit()
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Could not update quest.')
+    }
+  }
+
+  const deleteHabit = async (habitId: string, habitTitle: string) => {
+    if (!window.confirm(`Delete "${habitTitle}"? This cannot be undone.`)) return
+    setError(null)
+    try {
+      await disableHabit(habitId)
+      setHabits(prev => prev.filter(h => h.id !== habitId))
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Could not delete quest.')
+    }
+  }
+
+  const filteredHabits = useMemo(() => {
+    if (selectedChildFilter === 'all') return habits
+    return habits.filter(h => h.child_id === selectedChildFilter)
+  }, [habits, selectedChildFilter])
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-cream to-lavender-light p-4">
       <div className="max-w-xl mx-auto pt-6">
@@ -341,25 +407,36 @@ export function ApprovalQueue() {
         </div>
 
         {/* Tabs */}
-        <div className="flex gap-2 mb-6">
+        <div className="flex flex-wrap gap-2 mb-6">
           <Button
             variant={tab === 'approvals' ? 'default' : 'outline'}
             onClick={() => setTab('approvals')}
             className={tab === 'approvals' ? 'bg-lavender' : ''}
+            size="sm"
           >
             Approvals {totalCount > 0 && `(${totalCount})`}
+          </Button>
+          <Button
+            variant={tab === 'habits' ? 'default' : 'outline'}
+            onClick={() => setTab('habits')}
+            className={tab === 'habits' ? 'bg-lavender' : ''}
+            size="sm"
+          >
+            Quests
           </Button>
           <Button
             variant={tab === 'rewards' ? 'default' : 'outline'}
             onClick={() => setTab('rewards')}
             className={tab === 'rewards' ? 'bg-lavender' : ''}
+            size="sm"
           >
-            Star Store
+            Store
           </Button>
           <Button
             variant={tab === 'children' ? 'default' : 'outline'}
             onClick={() => setTab('children')}
             className={tab === 'children' ? 'bg-lavender' : ''}
+            size="sm"
           >
             Children
           </Button>
@@ -472,6 +549,122 @@ export function ApprovalQueue() {
                 </div>
               </>
             )}
+          </div>
+        )}
+
+        {/* Habits Tab */}
+        {tab === 'habits' && (
+          <div>
+            <div className="flex justify-between items-center mb-4">
+              <p className="text-lg font-bold text-charcoal">Manage Quests</p>
+            </div>
+
+            {/* Child filter */}
+            {children.length > 1 && (
+              <div className="flex gap-2 mb-4 overflow-x-auto">
+                <Button
+                  size="sm"
+                  variant={selectedChildFilter === 'all' ? 'default' : 'outline'}
+                  onClick={() => setSelectedChildFilter('all')}
+                  className={selectedChildFilter === 'all' ? 'bg-lavender' : ''}
+                >
+                  All
+                </Button>
+                {children.map(child => (
+                  <Button
+                    key={child.id}
+                    size="sm"
+                    variant={selectedChildFilter === child.id ? 'default' : 'outline'}
+                    onClick={() => setSelectedChildFilter(child.id)}
+                    className={selectedChildFilter === child.id ? 'bg-lavender' : ''}
+                  >
+                    {child.avatar} {child.name}
+                  </Button>
+                ))}
+              </div>
+            )}
+
+            <div className="space-y-3">
+              {filteredHabits.map((habit) => (
+                <Card key={habit.id} className="bg-card">
+                  <CardContent className="p-4">
+                    {editingHabitId === habit.id ? (
+                      <div className="space-y-3">
+                        <Input
+                          value={editHabitTitle}
+                          onChange={(e) => setEditHabitTitle(e.target.value)}
+                          placeholder="Quest title..."
+                          className="border-2 border-charcoal"
+                        />
+                        <Input
+                          value={editHabitDescription}
+                          onChange={(e) => setEditHabitDescription(e.target.value)}
+                          placeholder="Description (optional)..."
+                          className="border-2 border-charcoal"
+                        />
+                        <div className="flex items-center gap-4">
+                          <label className="flex items-center gap-2 cursor-pointer">
+                            <input
+                              type="checkbox"
+                              checked={editHabitIsCore}
+                              onChange={(e) => setEditHabitIsCore(e.target.checked)}
+                              className="w-4 h-4"
+                            />
+                            <span className="font-bold text-sm">Core Quest (required daily)</span>
+                          </label>
+                        </div>
+                        <div className="flex gap-2">
+                          <Button size="sm" onClick={() => saveHabit(habit.id)} className="bg-sage text-charcoal">
+                            <Check className="w-4 h-4 mr-1" /> Save
+                          </Button>
+                          <Button size="sm" variant="outline" onClick={cancelEditHabit}>
+                            <X className="w-4 h-4 mr-1" /> Cancel
+                          </Button>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-start gap-3">
+                          <div className="text-2xl">{habit.child?.avatar ?? '📋'}</div>
+                          <div>
+                            <p className="font-bold text-lg">{habit.title}</p>
+                            {habit.description && (
+                              <p className="text-sm text-charcoal-light">{habit.description}</p>
+                            )}
+                            <div className="flex items-center gap-2 mt-1">
+                              <span className={`text-xs px-2 py-0.5 rounded-full font-bold ${
+                                habit.is_core ? 'bg-lavender text-charcoal' : 'bg-gold-light text-charcoal'
+                              }`}>
+                                {habit.is_core ? '⚡ Core' : '🌟 Bonus'}
+                              </span>
+                              <span className="text-xs text-charcoal-light">{habit.child?.name}</span>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="flex gap-2">
+                          <Button size="sm" variant="outline" onClick={() => startEditHabit(habit)}>
+                            <Pencil className="w-4 h-4" />
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="text-coral"
+                            onClick={() => deleteHabit(habit.id, habit.title)}
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              ))}
+              {filteredHabits.length === 0 && (
+                <p className="text-center text-charcoal-light py-8">
+                  No quests yet. Add children to get started!
+                </p>
+              )}
+            </div>
           </div>
         )}
 
