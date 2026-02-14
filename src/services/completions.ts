@@ -176,3 +176,75 @@ export async function awardStarsIfNeeded(childId: string, dateISO: string) {
 
   return { dayStars, totalStars: approvedTotal }
 }
+
+/**
+ * Get the current streak for a child.
+ * A streak is consecutive days (including today) where all core habits were completed and approved.
+ */
+export async function getChildStreak(childId: string): Promise<{ streak: number; lastDate: string | null }> {
+  // Get all core habits for this child
+  const { data: habitsData, error: habitsError } = await supabase
+    .from('habits')
+    .select('id')
+    .eq('child_id', childId)
+    .eq('is_core', true)
+    .eq('active', true)
+
+  if (habitsError) throw habitsError
+  
+  const coreHabitIds = (habitsData as Array<{ id: string }>).map(h => h.id)
+  if (coreHabitIds.length === 0) return { streak: 0, lastDate: null }
+
+  // Get completions for the last 90 days
+  const ninetyDaysAgo = new Date()
+  ninetyDaysAgo.setDate(ninetyDaysAgo.getDate() - 90)
+  const ninetyDaysAgoISO = ninetyDaysAgo.toISOString().split('T')[0]
+
+  const { data: completionsData, error: completionsError } = await supabase
+    .from('habit_completions')
+    .select('habit_id, completed_date')
+    .eq('child_id', childId)
+    .not('approved_at', 'is', null)
+    .is('rejected_at', null)
+    .gte('completed_date', ninetyDaysAgoISO)
+    .order('completed_date', { ascending: false })
+
+  if (completionsError) throw completionsError
+
+  const completions = completionsData as Array<{ habit_id: string; completed_date: string }>
+
+  // Group completions by date
+  const completionsByDate = new Map<string, Set<string>>()
+  for (const c of completions) {
+    if (!completionsByDate.has(c.completed_date)) {
+      completionsByDate.set(c.completed_date, new Set())
+    }
+    completionsByDate.get(c.completed_date)!.add(c.habit_id)
+  }
+
+  // Calculate streak starting from today going backwards
+  let streak = 0
+  let lastDate: string | null = null
+  const today = new Date()
+  
+  for (let i = 0; i < 90; i++) {
+    const date = new Date(today)
+    date.setDate(date.getDate() - i)
+    const dateISO = date.toISOString().split('T')[0]
+    
+    const dayCompletions = completionsByDate.get(dateISO)
+    
+    // Check if all core habits were completed on this day
+    if (dayCompletions && coreHabitIds.every(id => dayCompletions.has(id))) {
+      streak++
+      if (!lastDate) lastDate = dateISO
+    } else {
+      // Streak broken - but if we're on day 0 (today), 
+      // allow streak to continue if yesterday had completions
+      if (i === 0) continue
+      break
+    }
+  }
+
+  return { streak, lastDate }
+}

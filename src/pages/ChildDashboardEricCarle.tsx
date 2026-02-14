@@ -5,6 +5,7 @@ import { listHabitsForChild } from "@/services/habits"
 import { createCompletion, listCompletionsForChildOnDate } from "@/services/completions"
 import { SiblingSelector } from "@/components/SiblingSelector"
 import { useCompletionAnimation } from "@/components/CompletionAnimation"
+import { StreakCounter } from "@/components/StreakCounter"
 import type { Child, Habit } from "@/types"
 import { useEffect, useMemo, useState } from "react"
 import { useNavigate, useParams } from "react-router-dom"
@@ -131,23 +132,28 @@ export function ChildDashboardEricCarle() {
             <ArrowLeft className="w-6 h-6 text-white" />
           </button>
           
-          {/* Star counter - like a painted sun */}
-          <div 
-            className="relative px-6 py-3 flex items-center gap-3"
-            style={{
-              backgroundColor: colors.yellow,
-              borderRadius: '50% 50% 50% 50% / 60% 60% 40% 40%',
-              boxShadow: '6px 6px 0 rgba(0,0,0,0.15)',
-              transform: 'rotate(3deg)'
-            }}
-          >
-            {/* Sun rays */}
-            <div className="absolute -top-2 -left-2 w-4 h-4 rounded-full" style={{ backgroundColor: colors.orange }} />
-            <div className="absolute -top-3 right-4 w-3 h-3 rounded-full" style={{ backgroundColor: colors.orange }} />
-            <div className="absolute -bottom-1 -right-2 w-3 h-3 rounded-full" style={{ backgroundColor: colors.orange }} />
+          <div className="flex items-center gap-3">
+            {/* Streak counter */}
+            {childId && <StreakCounter childId={childId} variant="compact" />}
             
-            <Star className="w-8 h-8" style={{ color: colors.orange, fill: colors.orange }} />
-            <span className="text-3xl font-black" style={{ color: colors.brown }}>{child?.stars ?? 0}</span>
+            {/* Star counter - like a painted sun */}
+            <div 
+              className="relative px-6 py-3 flex items-center gap-3"
+              style={{
+                backgroundColor: colors.yellow,
+                borderRadius: '50% 50% 50% 50% / 60% 60% 40% 40%',
+                boxShadow: '6px 6px 0 rgba(0,0,0,0.15)',
+                transform: 'rotate(3deg)'
+              }}
+            >
+              {/* Sun rays */}
+              <div className="absolute -top-2 -left-2 w-4 h-4 rounded-full" style={{ backgroundColor: colors.orange }} />
+              <div className="absolute -top-3 right-4 w-3 h-3 rounded-full" style={{ backgroundColor: colors.orange }} />
+              <div className="absolute -bottom-1 -right-2 w-3 h-3 rounded-full" style={{ backgroundColor: colors.orange }} />
+              
+              <Star className="w-8 h-8" style={{ color: colors.orange, fill: colors.orange }} />
+              <span className="text-3xl font-black" style={{ color: colors.brown }}>{child?.stars ?? 0}</span>
+            </div>
           </div>
         </div>
 

@@ -27,7 +27,7 @@
 ### 🟡 Child Experience
 - [x] Quick switch between children from dashboard
 - [x] Habit completion animations / sounds
-- [ ] Streak counter on dashboard
+- [x] Streak counter on dashboard
 - [ ] Habit history view (past completions)
 - [ ] Achievement badges
 

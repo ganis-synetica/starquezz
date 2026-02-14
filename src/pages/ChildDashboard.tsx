@@ -7,6 +7,7 @@ import { listHabitsForChild } from "@/services/habits"
 import { createCompletion, listCompletionsForChildOnDate } from "@/services/completions"
 import { SiblingSelector } from "@/components/SiblingSelector"
 import { useCompletionAnimation } from "@/components/CompletionAnimation"
+import { StreakCounter } from "@/components/StreakCounter"
 import type { Child, Habit } from "@/types"
 import { useEffect, useMemo, useState } from "react"
 import { useNavigate, useParams } from "react-router-dom"
@@ -104,9 +105,14 @@ export function ChildDashboard() {
             >
             <ArrowLeft className="w-6 h-6" />
           </Button>
-          <div className="flex items-center gap-2 bg-gold-light px-4 py-2 rounded-full border-4 border-charcoal shadow-[4px_4px_0px_0px_rgba(74,68,83,0.6)]">
-            <Star className="w-6 h-6 fill-gold text-charcoal" />
-            <span className="text-xl font-black text-charcoal">{child?.stars ?? 0}</span>
+          <div className="flex items-center gap-3">
+            {/* Streak counter */}
+            {childId && <StreakCounter childId={childId} />}
+            {/* Stars */}
+            <div className="flex items-center gap-2 bg-gold-light px-4 py-2 rounded-full border-4 border-charcoal shadow-[4px_4px_0px_0px_rgba(74,68,83,0.6)]">
+              <Star className="w-6 h-6 fill-gold text-charcoal" />
+              <span className="text-xl font-black text-charcoal">{child?.stars ?? 0}</span>
+            </div>
           </div>
         </div>
 
