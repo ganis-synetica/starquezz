@@ -150,6 +150,28 @@ export function ApprovalQueue() {
     }
   }
 
+  const onBulkApprove = async () => {
+    if (rows.length === 0) return
+    if (!window.confirm(`Approve all ${rows.length} pending quests?`)) return
+    
+    setBusyId('bulk')
+    setError(null)
+    
+    try {
+      for (const row of rows) {
+        const updated = await approveCompletion(row.id)
+        const childId = updated.habits.child_id
+        const dateISO = dateISOFromTimestamp(updated.completed_at)
+        await awardStarsIfNeeded(childId, dateISO)
+      }
+      setRows([])
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Bulk approve failed.')
+    } finally {
+      setBusyId(null)
+    }
+  }
+
   const onApprove = async (row: PendingRow) => {
     setBusyId(row.id)
     setError(null)
@@ -451,7 +473,19 @@ export function ApprovalQueue() {
         {/* Approvals Tab */}
         {tab === 'approvals' && (
           <div>
-            <p className="text-lg font-bold text-charcoal mb-4">{headerText}</p>
+            <div className="flex items-center justify-between mb-4">
+              <p className="text-lg font-bold text-charcoal">{headerText}</p>
+              {habitCount > 1 && (
+                <Button
+                  size="sm"
+                  className="bg-sage text-charcoal hover:bg-sage-light"
+                  onClick={onBulkApprove}
+                  disabled={busyId === 'bulk'}
+                >
+                  {busyId === 'bulk' ? 'Approving...' : `Approve All (${habitCount})`}
+                </Button>
+              )}
+            </div>
             
             {/* Habit Approvals */}
             {habitCount > 0 && (
