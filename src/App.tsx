@@ -3,6 +3,7 @@ import { HomePage } from './pages/HomePage'
 import { ChildDashboard } from './pages/ChildDashboard'
 import { ChildDashboardEricCarle } from './pages/ChildDashboardEricCarle'
 import { StarStore } from './pages/StarStore'
+import { MyRewards } from './pages/MyRewards'
 import { ParentLogin } from './pages/ParentLogin'
 import { ParentSignUp } from './pages/ParentSignUp'
 import { ApprovalQueue } from './pages/ApprovalQueue'
@@ -88,6 +89,14 @@ function App() {
           element={
             <ChildProtectedRoute>
               <StarStore />
+            </ChildProtectedRoute>
+          }
+        />
+        <Route
+          path="/rewards/:id"
+          element={
+            <ChildProtectedRoute>
+              <MyRewards />
             </ChildProtectedRoute>
           }
         />

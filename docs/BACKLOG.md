@@ -7,8 +7,8 @@
 - [x] Add purchase button handler  
 - [x] Create redemptions table migration
 - [x] Show loading/success states
-- [ ] Add redemptions to parent approval queue
-- [ ] Add "My Rewards" history for children
+- [x] Add redemptions to parent approval queue
+- [x] Add "My Rewards" history for children
 
 ### 🔴 Forgot PIN Flow
 - [ ] Add "Forgot PIN" link on PIN entry page

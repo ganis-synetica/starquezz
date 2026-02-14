@@ -389,24 +389,39 @@ export function ChildDashboardEricCarle() {
           </div>
         </div>
 
-        {/* Star Store Button - Big colorful caterpillar-inspired */}
-        <button
-          onClick={() => navigate(`/store/${childId}`)}
-          className="w-full py-4 px-6 font-black text-xl transition-transform hover:scale-[1.02] active:scale-[0.98]"
-          style={{
-            backgroundColor: colors.red,
-            color: 'white',
-            borderRadius: '50px',
-            boxShadow: '6px 6px 0 rgba(0,0,0,0.2)',
-            transform: 'rotate(-0.5deg)'
-          }}
-        >
-          🛒 Visit Star Store!
-        </button>
+        {/* Action Buttons */}
+        <div className="grid grid-cols-2 gap-3 mb-4">
+          <button
+            onClick={() => navigate(`/store/${childId}`)}
+            className="py-4 px-4 font-black text-lg transition-transform hover:scale-[1.02] active:scale-[0.98]"
+            style={{
+              backgroundColor: colors.red,
+              color: 'white',
+              borderRadius: '20px',
+              boxShadow: '4px 4px 0 rgba(0,0,0,0.2)',
+              transform: 'rotate(-0.5deg)'
+            }}
+          >
+            🛒 Star Store
+          </button>
+          <button
+            onClick={() => navigate(`/rewards/${childId}`)}
+            className="py-4 px-4 font-black text-lg transition-transform hover:scale-[1.02] active:scale-[0.98]"
+            style={{
+              backgroundColor: colors.purple,
+              color: 'white',
+              borderRadius: '20px',
+              boxShadow: '4px 4px 0 rgba(0,0,0,0.2)',
+              transform: 'rotate(0.5deg)'
+            }}
+          >
+            🎁 My Rewards
+          </button>
+        </div>
 
         <button
           onClick={() => navigate('/')}
-          className="w-full mt-4 py-3 px-6 font-bold text-lg transition-transform hover:scale-[1.02]"
+          className="w-full py-3 px-6 font-bold text-lg transition-transform hover:scale-[1.02]"
           style={{
             backgroundColor: 'transparent',
             color: colors.brown,

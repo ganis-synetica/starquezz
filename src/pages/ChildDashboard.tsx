@@ -204,13 +204,18 @@ export function ChildDashboard() {
           )}
         </div>
 
-        {/* Star Store Button */}
-        <Button className="w-full bg-gold text-charcoal hover:bg-gold-light" size="lg" onClick={() => navigate(`/store/${childId}`)}>
-          🛒 Star Store
-        </Button>
+        {/* Action Buttons */}
+        <div className="grid grid-cols-2 gap-3 mb-3">
+          <Button className="bg-gold text-charcoal hover:bg-gold-light" size="lg" onClick={() => navigate(`/store/${childId}`)}>
+            🛒 Star Store
+          </Button>
+          <Button className="bg-lavender text-charcoal hover:bg-lavender-light" size="lg" onClick={() => navigate(`/rewards/${childId}`)}>
+            🎁 My Rewards
+          </Button>
+        </div>
 
         <Button
-          className="w-full mt-3"
+          className="w-full"
           variant="outline"
           onClick={() => navigate('/')}
         >
