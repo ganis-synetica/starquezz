@@ -4,10 +4,11 @@ import { Input } from '@/components/ui/input'
 import { useAuth } from '@/contexts/AuthContext'
 import { supabase } from '@/lib/supabase'
 import { awardStarsIfNeeded, approveCompletion, listPendingApprovals, rejectCompletion } from '@/services/completions'
+import { listPendingRedemptions, fulfillRedemption, cancelRedemption, type RedemptionWithDetails } from '@/services/redemptions'
 import type { Child, Reward } from '@/types'
 import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Star, Pencil, Trash2, Plus, Check, X } from 'lucide-react'
+import { Star, Pencil, Trash2, Plus, Check, X, Gift, ShoppingBag } from 'lucide-react'
 
 type PendingRow = Awaited<ReturnType<typeof listPendingApprovals>>[number]
 type ChildWithStars = Pick<Child, 'id' | 'name' | 'avatar' | 'stars'>
@@ -30,6 +31,7 @@ export function ApprovalQueue() {
 
   const [tab, setTab] = useState<Tab>('approvals')
   const [rows, setRows] = useState<PendingRow[]>([])
+  const [redemptions, setRedemptions] = useState<RedemptionWithDetails[]>([])
   const [childrenById, setChildrenById] = useState<Record<string, ChildWithStars>>({})
   const [children, setChildren] = useState<ChildWithStars[]>([])
   const [rewards, setRewards] = useState<Reward[]>([])
@@ -62,8 +64,9 @@ export function ApprovalQueue() {
 
     void (async () => {
       setError(null)
-      const [pending, childrenRes, rewardsRes] = await Promise.all([
+      const [pending, pendingRedemptions, childrenRes, rewardsRes] = await Promise.all([
         listPendingApprovals(),
+        listPendingRedemptions(),
         supabase.from('children').select('id,name,avatar,stars'),
         supabase.from('rewards').select('*').eq('parent_id', parentId).eq('active', true).order('star_cost'),
       ])
@@ -79,13 +82,59 @@ export function ApprovalQueue() {
       setChildrenById(map)
       setChildren(childList)
       setRows(pending)
+      setRedemptions(pendingRedemptions)
       setRewards((rewardsRes.data ?? []) as Reward[])
     })().catch((err) => {
       setError(err instanceof Error ? err.message : 'Could not load data.')
     })
   }, [parentId])
 
-  const count = rows.length
+  const habitCount = rows.length
+  const redemptionCount = redemptions.length
+  const totalCount = habitCount + redemptionCount
+
+  const onFulfillRedemption = async (redemption: RedemptionWithDetails) => {
+    setBusyId(redemption.id)
+    setError(null)
+    try {
+      await fulfillRedemption(redemption.id)
+      setRedemptions((prev) => prev.filter((r) => r.id !== redemption.id))
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Fulfill failed.')
+    } finally {
+      setBusyId(null)
+    }
+  }
+
+  const onCancelRedemption = async (redemption: RedemptionWithDetails) => {
+    if (!window.confirm(`Cancel this reward? ${redemption.stars_spent} stars will be refunded.`)) return
+    setBusyId(redemption.id)
+    setError(null)
+    try {
+      await cancelRedemption(redemption.id)
+      setRedemptions((prev) => prev.filter((r) => r.id !== redemption.id))
+      // Update child's stars in local state
+      const childId = redemption.child_id
+      setChildren((prev) =>
+        prev.map((c) =>
+          c.id === childId ? { ...c, stars: c.stars + redemption.stars_spent } : c
+        )
+      )
+      setChildrenById((prev) => {
+        if (prev[childId]) {
+          return {
+            ...prev,
+            [childId]: { ...prev[childId], stars: prev[childId].stars + redemption.stars_spent },
+          }
+        }
+        return prev
+      })
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Cancel failed.')
+    } finally {
+      setBusyId(null)
+    }
+  }
 
   const onApprove = async (row: PendingRow) => {
     setBusyId(row.id)
@@ -270,10 +319,12 @@ export function ApprovalQueue() {
   }
 
   const headerText = useMemo(() => {
-    if (count === 0) return 'No pending approvals. Nice!'
-    if (count === 1) return '1 quest waiting for your OK!'
-    return `${count} quests waiting for your OK!`
-  }, [count])
+    if (totalCount === 0) return 'No pending approvals. Nice!'
+    const parts: string[] = []
+    if (habitCount > 0) parts.push(`${habitCount} quest${habitCount > 1 ? 's' : ''}`)
+    if (redemptionCount > 0) parts.push(`${redemptionCount} reward${redemptionCount > 1 ? 's' : ''}`)
+    return `${parts.join(' and ')} waiting for your OK!`
+  }, [totalCount, habitCount, redemptionCount])
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-cream to-lavender-light p-4">
@@ -296,7 +347,7 @@ export function ApprovalQueue() {
             onClick={() => setTab('approvals')}
             className={tab === 'approvals' ? 'bg-lavender' : ''}
           >
-            Approvals {count > 0 && `(${count})`}
+            Approvals {totalCount > 0 && `(${totalCount})`}
           </Button>
           <Button
             variant={tab === 'rewards' ? 'default' : 'outline'}
@@ -324,37 +375,103 @@ export function ApprovalQueue() {
         {tab === 'approvals' && (
           <div>
             <p className="text-lg font-bold text-charcoal mb-4">{headerText}</p>
-            <div className="space-y-4">
-              {rows.map((row) => {
-                const childId = row.habits.child_id
-                const child = childrenById[childId]
-                const isBusy = busyId === row.id
-                return (
-                  <Card key={row.id} className="bg-card">
-                    <CardContent className="p-4">
-                      <div className="flex items-start justify-between gap-3">
-                        <div className="flex items-start gap-3">
-                          <div className="text-3xl">{child?.avatar ?? '⭐'}</div>
-                          <div>
-                            <p className="font-black">{child?.name ?? 'Unknown'}</p>
-                            <p className="text-lg font-bold">{row.habits.title}</p>
-                            <p className="text-xs text-charcoal-light">{new Date(row.completed_at).toLocaleString()}</p>
+            
+            {/* Habit Approvals */}
+            {habitCount > 0 && (
+              <>
+                <h3 className="text-sm font-bold text-charcoal-light uppercase tracking-wide mb-2 flex items-center gap-2">
+                  <Check className="w-4 h-4" /> Quests
+                </h3>
+                <div className="space-y-4 mb-6">
+                  {rows.map((row) => {
+                    const childId = row.habits.child_id
+                    const child = childrenById[childId]
+                    const isBusy = busyId === row.id
+                    return (
+                      <Card key={row.id} className="bg-card">
+                        <CardContent className="p-4">
+                          <div className="flex items-start justify-between gap-3">
+                            <div className="flex items-start gap-3">
+                              <div className="text-3xl">{child?.avatar ?? '⭐'}</div>
+                              <div>
+                                <p className="font-black">{child?.name ?? 'Unknown'}</p>
+                                <p className="text-lg font-bold">{row.habits.title}</p>
+                                <p className="text-xs text-charcoal-light">{new Date(row.completed_at).toLocaleString()}</p>
+                              </div>
+                            </div>
+                            <div className="flex flex-col gap-2">
+                              <Button size="sm" className="bg-sage text-charcoal hover:bg-sage-light" disabled={isBusy} onClick={() => void onApprove(row)}>
+                                ✓
+                              </Button>
+                              <Button size="sm" className="bg-coral text-charcoal hover:bg-coral-light" disabled={isBusy} onClick={() => void onReject(row)}>
+                                ✗
+                              </Button>
+                            </div>
                           </div>
-                        </div>
-                        <div className="flex flex-col gap-2">
-                          <Button size="sm" className="bg-sage text-charcoal hover:bg-sage-light" disabled={isBusy} onClick={() => void onApprove(row)}>
-                            ✓
-                          </Button>
-                          <Button size="sm" className="bg-coral text-charcoal hover:bg-coral-light" disabled={isBusy} onClick={() => void onReject(row)}>
-                            ✗
-                          </Button>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                )
-              })}
-            </div>
+                        </CardContent>
+                      </Card>
+                    )
+                  })}
+                </div>
+              </>
+            )}
+
+            {/* Redemption Fulfillments */}
+            {redemptionCount > 0 && (
+              <>
+                <h3 className="text-sm font-bold text-charcoal-light uppercase tracking-wide mb-2 flex items-center gap-2">
+                  <Gift className="w-4 h-4" /> Rewards to Give
+                </h3>
+                <div className="space-y-4">
+                  {redemptions.map((redemption) => {
+                    const isBusy = busyId === redemption.id
+                    return (
+                      <Card key={redemption.id} className="bg-gold-light border-gold">
+                        <CardContent className="p-4">
+                          <div className="flex items-start justify-between gap-3">
+                            <div className="flex items-start gap-3">
+                              <div className="text-3xl">{redemption.child?.avatar ?? '🎁'}</div>
+                              <div>
+                                <p className="font-black">{redemption.child?.name ?? 'Unknown'}</p>
+                                <div className="flex items-center gap-2">
+                                  <ShoppingBag className="w-4 h-4 text-gold" />
+                                  <p className="text-lg font-bold">{redemption.reward?.title ?? 'Reward'}</p>
+                                </div>
+                                <div className="flex items-center gap-1 text-sm text-charcoal-light">
+                                  <Star className="w-3 h-3 fill-gold text-gold" />
+                                  <span>{redemption.stars_spent} stars spent</span>
+                                </div>
+                                <p className="text-xs text-charcoal-light">{new Date(redemption.created_at).toLocaleString()}</p>
+                              </div>
+                            </div>
+                            <div className="flex flex-col gap-2">
+                              <Button 
+                                size="sm" 
+                                className="bg-sage text-charcoal hover:bg-sage-light" 
+                                disabled={isBusy} 
+                                onClick={() => void onFulfillRedemption(redemption)}
+                                title="Fulfill reward"
+                              >
+                                <Gift className="w-4 h-4" />
+                              </Button>
+                              <Button 
+                                size="sm" 
+                                className="bg-coral text-charcoal hover:bg-coral-light" 
+                                disabled={isBusy} 
+                                onClick={() => void onCancelRedemption(redemption)}
+                                title="Cancel & refund"
+                              >
+                                <X className="w-4 h-4" />
+                              </Button>
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    )
+                  })}
+                </div>
+              </>
+            )}
           </div>
         )}
 

@@ -1,5 +1,10 @@
 import { supabase } from '@/lib/supabase'
-import type { Redemption } from '@/types'
+import type { Redemption, Reward, Child } from '@/types'
+
+export type RedemptionWithDetails = Redemption & {
+  reward: Reward
+  child: Pick<Child, 'id' | 'name' | 'avatar'>
+}
 
 export async function createRedemption(
   childId: string,
@@ -51,15 +56,26 @@ export async function createRedemption(
   return data as Redemption
 }
 
-export async function listRedemptionsForChild(childId: string): Promise<Redemption[]> {
+export async function listRedemptionsForChild(childId: string): Promise<RedemptionWithDetails[]> {
   const { data, error } = await supabase
     .from('redemptions')
-    .select('*, reward:rewards(*)')
+    .select('*, reward:rewards(*), child:children(id, name, avatar)')
     .eq('child_id', childId)
     .order('created_at', { ascending: false })
 
   if (error) throw error
-  return data as Redemption[]
+  return data as RedemptionWithDetails[]
+}
+
+export async function listPendingRedemptions(): Promise<RedemptionWithDetails[]> {
+  const { data, error } = await supabase
+    .from('redemptions')
+    .select('*, reward:rewards(*), child:children(id, name, avatar)')
+    .eq('status', 'pending')
+    .order('created_at', { ascending: false })
+
+  if (error) throw error
+  return data as RedemptionWithDetails[]
 }
 
 export async function fulfillRedemption(redemptionId: string): Promise<void> {
@@ -72,4 +88,52 @@ export async function fulfillRedemption(redemptionId: string): Promise<void> {
     .eq('id', redemptionId)
 
   if (error) throw error
+}
+
+export async function cancelRedemption(redemptionId: string): Promise<void> {
+  // 1. Get the redemption details to know how many stars to refund
+  const { data: redemption, error: fetchError } = await supabase
+    .from('redemptions')
+    .select('child_id, stars_spent, status')
+    .eq('id', redemptionId)
+    .single()
+
+  if (fetchError) throw fetchError
+  if (!redemption) throw new Error('Redemption not found')
+  if (redemption.status !== 'pending') {
+    throw new Error('Can only cancel pending redemptions')
+  }
+
+  // 2. Get current child stars
+  const { data: child, error: childError } = await supabase
+    .from('children')
+    .select('stars')
+    .eq('id', redemption.child_id)
+    .single()
+
+  if (childError) throw childError
+  if (!child) throw new Error('Child not found')
+
+  // 3. Refund stars to child
+  const { error: refundError } = await supabase
+    .from('children')
+    .update({ stars: child.stars + redemption.stars_spent })
+    .eq('id', redemption.child_id)
+
+  if (refundError) throw refundError
+
+  // 4. Update redemption status
+  const { error: updateError } = await supabase
+    .from('redemptions')
+    .update({ status: 'cancelled' })
+    .eq('id', redemptionId)
+
+  if (updateError) {
+    // Rollback stars if status update fails
+    await supabase
+      .from('children')
+      .update({ stars: child.stars })
+      .eq('id', redemption.child_id)
+    throw updateError
+  }
 }
