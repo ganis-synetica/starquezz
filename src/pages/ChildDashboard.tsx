@@ -6,6 +6,7 @@ import { supabase } from "@/lib/supabase"
 import { listHabitsForChild } from "@/services/habits"
 import { createCompletion, listCompletionsForChildOnDate } from "@/services/completions"
 import { SiblingSelector } from "@/components/SiblingSelector"
+import { useCompletionAnimation } from "@/components/CompletionAnimation"
 import type { Child, Habit } from "@/types"
 import { useEffect, useMemo, useState } from "react"
 import { useNavigate, useParams } from "react-router-dom"
@@ -31,6 +32,7 @@ export function ChildDashboard() {
   const [child, setChild] = useState<Pick<Child, 'id' | 'name' | 'avatar' | 'stars'> | null>(null)
   const [habits, setHabits] = useState<HabitWithStatus[]>([])
   const [error, setError] = useState<string | null>(null)
+  const { triggerAnimation, Animation } = useCompletionAnimation()
 
   useEffect(() => {
     if (!childId) return
@@ -83,6 +85,8 @@ export function ChildDashboard() {
     try {
       await createCompletion(habit.id, childId, dateISO)
       setHabits((prev) => prev.map((h) => (h.id === habit.id ? { ...h, completed: true, pending: true } : h)))
+      // Trigger celebration animation!
+      triggerAnimation(habit.is_core ? 'habit' : 'bonus')
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Could not complete quest. Try again!')
     }
@@ -226,6 +230,9 @@ export function ChildDashboard() {
           Switch Profile
         </Button>
       </div>
+      
+      {/* Completion Animation */}
+      {Animation}
     </div>
   )
 }
