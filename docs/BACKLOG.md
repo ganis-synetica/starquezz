@@ -61,7 +61,7 @@
 
 ## Tech Debt
 
-- [ ] Add proper error boundaries
+- [x] Add proper error boundaries
 - [ ] Add loading skeletons
 - [ ] Optimize Supabase queries
 - [ ] Add E2E tests
