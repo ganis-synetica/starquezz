@@ -62,7 +62,7 @@
 ## Tech Debt
 
 - [x] Add proper error boundaries
-- [ ] Add loading skeletons
+- [x] Add loading skeletons
 - [ ] Optimize Supabase queries
 - [ ] Add E2E tests
 - [ ] PWA support for offline

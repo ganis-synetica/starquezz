@@ -8,6 +8,7 @@ import { createCompletion, listCompletionsForChildOnDate } from "@/services/comp
 import { SiblingSelector } from "@/components/SiblingSelector"
 import { useCompletionAnimation } from "@/components/CompletionAnimation"
 import { StreakCounter } from "@/components/StreakCounter"
+import { SkeletonDashboard } from "@/components/Skeleton"
 import type { Child, Habit } from "@/types"
 import { useEffect, useMemo, useState } from "react"
 import { useNavigate, useParams } from "react-router-dom"
@@ -32,6 +33,7 @@ export function ChildDashboard() {
 
   const [child, setChild] = useState<Pick<Child, 'id' | 'name' | 'avatar' | 'stars'> | null>(null)
   const [habits, setHabits] = useState<HabitWithStatus[]>([])
+  const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const { triggerAnimation, Animation } = useCompletionAnimation()
 
@@ -40,6 +42,7 @@ export function ChildDashboard() {
 
     void (async () => {
       setError(null)
+      setLoading(true)
       const { data: childData, error: childError } = await supabase
         .from('children')
         .select('id,name,avatar,stars')
@@ -65,8 +68,10 @@ export function ChildDashboard() {
           return { ...h, completed, pending }
         }),
       )
+      setLoading(false)
     })().catch((err) => {
       setError(err instanceof Error ? err.message : 'Something went wrong loading quests.')
+      setLoading(false)
     })
   }, [childId, dateISO, navigate])
 
@@ -91,6 +96,16 @@ export function ChildDashboard() {
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Could not complete quest. Try again!')
     }
+  }
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-lavender-light to-rose-light p-4">
+        <div className="max-w-md mx-auto pt-4">
+          <SkeletonDashboard />
+        </div>
+      </div>
+    )
   }
 
   return (

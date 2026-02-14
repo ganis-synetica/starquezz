@@ -3,6 +3,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Star, Sparkles } from "lucide-react"
 import { useAuth } from "@/contexts/AuthContext"
 import { supabase } from "@/lib/supabase"
+import { SkeletonChildSelector } from "@/components/Skeleton"
 import type { Child } from "@/types"
 import { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
@@ -79,7 +80,7 @@ export function HomePage() {
           <h2 className="text-xl font-bold text-center text-charcoal">Who's ready to quest?</h2>
           {error && <p className="text-sm font-bold text-coral text-center">{error}</p>}
           {loading && status === 'authenticated' && (
-            <p className="text-sm font-bold text-charcoal text-center">Loading...</p>
+            <SkeletonChildSelector count={2} />
           )}
           {!loading && status !== 'authenticated' && (
             <p className="text-sm font-bold text-charcoal text-center">
