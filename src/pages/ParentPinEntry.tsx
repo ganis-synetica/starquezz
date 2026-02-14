@@ -1,9 +1,11 @@
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
+import { Input } from '@/components/ui/input'
 import { useAuth } from '@/contexts/AuthContext'
 import { supabase } from '@/lib/supabase'
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { Eye, EyeOff } from 'lucide-react'
 
 const PARENT_PIN_SESSION_KEY = 'starquezz.parent_pin_session'
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL as string
@@ -37,10 +39,12 @@ export function ParentPinEntry() {
 
   const [pin, setPin] = useState('')
   const [confirmPin, setConfirmPin] = useState('')
+  const [password, setPassword] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
   const [hasPin, setHasPin] = useState<boolean | null>(null)
-  const [mode, setMode] = useState<'check' | 'enter' | 'set' | 'forgot'>('check')
+  const [mode, setMode] = useState<'check' | 'enter' | 'set' | 'forgot' | 'reset'>('check')
 
   useEffect(() => {
     if (!user) {
@@ -99,9 +103,9 @@ export function ParentPinEntry() {
   }, [user, navigate])
 
   const handlePinPress = (digit: string) => {
-    if (mode === 'set' && pin.length < 4) {
+    if ((mode === 'set' || mode === 'reset') && pin.length < 4) {
       setPin(prev => prev + digit)
-    } else if (mode === 'set' && confirmPin.length < 4) {
+    } else if ((mode === 'set' || mode === 'reset') && confirmPin.length < 4) {
       setConfirmPin(prev => prev + digit)
     } else if (mode === 'enter' && pin.length < 4) {
       setPin(prev => prev + digit)
@@ -110,7 +114,7 @@ export function ParentPinEntry() {
   }
 
   const handleBackspace = () => {
-    if (mode === 'set' && confirmPin.length > 0) {
+    if ((mode === 'set' || mode === 'reset') && confirmPin.length > 0) {
       setConfirmPin(prev => prev.slice(0, -1))
     } else if (pin.length > 0) {
       setPin(prev => prev.slice(0, -1))
@@ -224,30 +228,97 @@ export function ParentPinEntry() {
     }
   }
 
-  const handleForgotPin = async () => {
+  const handleForgotPin = () => {
+    setMode('forgot')
+    setPin('')
+    setConfirmPin('')
+    setPassword('')
+    setError(null)
+  }
+
+  const handleVerifyPassword = async () => {
+    if (!password) {
+      setError('Please enter your password')
+      return
+    }
+
     setLoading(true)
     setError(null)
 
     try {
-      // Send password reset email (they'll need to log in again)
-      const { error } = await supabase.auth.resetPasswordForEmail(user!.email!, {
-        redirectTo: `${window.location.origin}/reset-password`,
+      // Verify password by re-authenticating
+      const { error } = await supabase.auth.signInWithPassword({
+        email: user!.email!,
+        password,
       })
 
-      if (error) throw error
+      if (error) {
+        setError('Incorrect password. Please try again.')
+        return
+      }
 
-      // Clear the PIN so they can set a new one after logging back in
-      await supabase
+      // Password verified, switch to reset mode
+      setMode('reset')
+      setPin('')
+      setConfirmPin('')
+      setPassword('')
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Verification failed')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleResetPin = async () => {
+    if (pin.length !== 4) {
+      setError('PIN must be 4 digits')
+      return
+    }
+    if (pin !== confirmPin) {
+      setError('PINs do not match')
+      setConfirmPin('')
+      return
+    }
+
+    setLoading(true)
+    setError(null)
+
+    try {
+      const { data: { session } } = await supabase.auth.getSession()
+      const token = session?.access_token ?? SUPABASE_ANON_KEY
+
+      const response = await fetch(
+        `${SUPABASE_URL}/functions/v1/verify-pin`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ action: 'hash', pin }),
+        }
+      )
+
+      const result = (await response.json()) as { hash?: string; error?: string }
+      if (!response.ok) {
+        throw new Error(result?.error ?? `Request failed (${response.status})`)
+      }
+      if (!result.hash) {
+        throw new Error(result?.error ?? 'Failed to hash PIN')
+      }
+
+      // Save new PIN hash
+      const { error: updateError } = await supabase
         .from('parents')
-        .update({ pin_hash: null })
+        .update({ pin_hash: result.hash })
         .eq('id', user!.id)
 
-      // Sign out
-      await supabase.auth.signOut()
+      if (updateError) throw updateError
 
-      navigate('/login', { state: { message: 'Check your email to reset your password and PIN.' } })
+      setParentPinSession()
+      navigate('/parent/approvals')
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to send reset email')
+      setError(err instanceof Error ? err.message : 'Failed to reset PIN')
     } finally {
       setLoading(false)
     }
@@ -269,16 +340,16 @@ export function ParentPinEntry() {
             <div className="text-center mb-6">
               <div className="text-5xl mb-3">🔐</div>
               <h1 className="text-2xl font-black text-charcoal">
-                {mode === 'set'
-                  ? 'Hi Parent, please set your PIN.'
-                  : mode === 'forgot'
-                    ? 'Hi Parent, reset your PIN.'
-                    : 'Hi Parent, enter your PIN.'}
+                {mode === 'set' && 'Hi Parent, please set your PIN.'}
+                {mode === 'enter' && 'Hi Parent, enter your PIN.'}
+                {mode === 'forgot' && 'Verify your identity'}
+                {mode === 'reset' && 'Set a new PIN'}
               </h1>
               <p className="text-charcoal-light text-sm mt-1">
-                {mode === 'enter'
-                  ? 'Enter your 4-digit PIN to open your dashboard.'
-                  : "You'll use this PIN to open your parent dashboard so only you can manage quests and rewards."}
+                {mode === 'enter' && 'Enter your 4-digit PIN to open your dashboard.'}
+                {mode === 'set' && "You'll use this PIN to open your parent dashboard so only you can manage quests and rewards."}
+                {mode === 'forgot' && 'Enter your account password to reset your PIN.'}
+                {mode === 'reset' && 'Choose a new 4-digit PIN for your dashboard.'}
               </p>
             </div>
 
@@ -290,42 +361,84 @@ export function ParentPinEntry() {
               </div>
             )}
 
-            {/* PIN dots */}
-            <div className="flex justify-center gap-4 mb-6">
-              {[0, 1, 2, 3].map((i) => {
-                const currentPin = mode === 'set' && pin.length === 4 ? confirmPin : pin
-                return (
-                  <div
-                    key={i}
-                    className={`w-4 h-4 rounded-full border-4 border-charcoal ${
-                      i < currentPin.length ? 'bg-lavender' : 'bg-card'
-                    }`}
+            {/* Password input for forgot mode */}
+            {mode === 'forgot' && (
+              <div className="mb-6">
+                <div className="relative">
+                  <Input
+                    type={showPassword ? 'text' : 'password'}
+                    placeholder="Enter your password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="pr-10 border-2 border-charcoal text-lg"
+                    onKeyDown={(e) => e.key === 'Enter' && handleVerifyPassword()}
                   />
-                )
-              })}
-            </div>
-
-            {mode === 'set' && pin.length === 4 && (
-              <p className="text-center text-sm text-charcoal-light mb-4">Confirm your PIN</p>
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-charcoal-light"
+                  >
+                    {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                  </button>
+                </div>
+                <Button
+                  className="w-full mt-4 bg-lavender hover:bg-lavender-light font-bold"
+                  onClick={handleVerifyPassword}
+                  disabled={loading || !password}
+                >
+                  {loading ? 'Verifying...' : 'Verify & Continue'}
+                </Button>
+                <Button
+                  variant="ghost"
+                  className="w-full mt-2 text-sm"
+                  onClick={() => { setMode('enter'); setError(null); }}
+                  disabled={loading}
+                >
+                  Cancel
+                </Button>
+              </div>
             )}
 
-            {/* Number pad */}
-            <div className="grid grid-cols-3 gap-2 mb-4">
-              {['1', '2', '3', '4', '5', '6', '7', '8', '9', '', '0', '⌫'].map((key) => (
-                <Button
-                  key={key}
-                  variant="outline"
-                  className={`h-14 text-2xl font-bold ${key === '' ? 'invisible' : ''}`}
-                  disabled={loading || key === ''}
-                  onClick={() => {
-                    if (key === '⌫') handleBackspace()
-                    else handlePinPress(key)
-                  }}
-                >
-                  {key}
-                </Button>
-              ))}
-            </div>
+            {/* PIN dots for set, enter, and reset modes */}
+            {(mode === 'set' || mode === 'enter' || mode === 'reset') && (
+              <>
+                <div className="flex justify-center gap-4 mb-6">
+                  {[0, 1, 2, 3].map((i) => {
+                    const currentPin = (mode === 'set' || mode === 'reset') && pin.length === 4 ? confirmPin : pin
+                    return (
+                      <div
+                        key={i}
+                        className={`w-4 h-4 rounded-full border-4 border-charcoal ${
+                          i < currentPin.length ? 'bg-lavender' : 'bg-card'
+                        }`}
+                      />
+                    )
+                  })}
+                </div>
+
+                {(mode === 'set' || mode === 'reset') && pin.length === 4 && (
+                  <p className="text-center text-sm text-charcoal-light mb-4">Confirm your PIN</p>
+                )}
+
+                {/* Number pad */}
+                <div className="grid grid-cols-3 gap-2 mb-4">
+                  {['1', '2', '3', '4', '5', '6', '7', '8', '9', '', '0', '⌫'].map((key) => (
+                    <Button
+                      key={key}
+                      variant="outline"
+                      className={`h-14 text-2xl font-bold ${key === '' ? 'invisible' : ''}`}
+                      disabled={loading || key === ''}
+                      onClick={() => {
+                        if (key === '⌫') handleBackspace()
+                        else handlePinPress(key)
+                      }}
+                    >
+                      {key}
+                    </Button>
+                  ))}
+                </div>
+              </>
+            )}
 
             {/* Action buttons */}
             {mode === 'set' && pin.length === 4 && confirmPin.length === 4 && (
@@ -335,6 +448,16 @@ export function ParentPinEntry() {
                 disabled={loading}
               >
                 {loading ? 'Setting PIN...' : 'Set PIN'}
+              </Button>
+            )}
+
+            {mode === 'reset' && pin.length === 4 && confirmPin.length === 4 && (
+              <Button 
+                className="w-full bg-sage text-charcoal hover:bg-sage-light font-bold"
+                onClick={handleResetPin}
+                disabled={loading}
+              >
+                {loading ? 'Resetting PIN...' : 'Reset PIN'}
               </Button>
             )}
 
@@ -355,17 +478,19 @@ export function ParentPinEntry() {
                 onClick={handleForgotPin}
                 disabled={loading}
               >
-                Forgot PIN? Reset via email
+                Forgot PIN?
               </Button>
             )}
 
-            <Button
-              variant="ghost"
-              className="w-full mt-2"
-              onClick={() => navigate('/')}
-            >
-              ← Back to Home
-            </Button>
+            {mode !== 'forgot' && (
+              <Button
+                variant="ghost"
+                className="w-full mt-2"
+                onClick={() => navigate('/')}
+              >
+                ← Back to Home
+              </Button>
+            )}
           </CardContent>
         </Card>
       </div>

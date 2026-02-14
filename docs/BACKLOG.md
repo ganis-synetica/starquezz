@@ -10,10 +10,10 @@
 - [x] Add redemptions to parent approval queue
 - [x] Add "My Rewards" history for children
 
-### 🔴 Forgot PIN Flow
-- [ ] Add "Forgot PIN" link on PIN entry page
-- [ ] Email verification to reset PIN
-- [ ] Or: security question fallback
+### ✅ DONE - Forgot PIN Flow
+- [x] Add "Forgot PIN" link on PIN entry page
+- [x] Password verification to reset PIN (no email needed)
+- [x] Inline PIN reset after verification
 
 ### 🔴 Notifications
 - [ ] Push notifications for pending approvals
