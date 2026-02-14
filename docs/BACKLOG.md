@@ -65,7 +65,7 @@
 - [x] Add loading skeletons
 - [ ] Optimize Supabase queries
 - [ ] Add E2E tests
-- [ ] PWA support for offline
+- [x] PWA support for offline
 
 ---
 
