@@ -4,6 +4,7 @@ import { ChildDashboard } from './pages/ChildDashboard'
 import { ChildDashboardEricCarle } from './pages/ChildDashboardEricCarle'
 import { StarStore } from './pages/StarStore'
 import { MyRewards } from './pages/MyRewards'
+import { HabitHistory } from './pages/HabitHistory'
 import { ParentLogin } from './pages/ParentLogin'
 import { ParentSignUp } from './pages/ParentSignUp'
 import { ApprovalQueue } from './pages/ApprovalQueue'
@@ -97,6 +98,14 @@ function App() {
           element={
             <ChildProtectedRoute>
               <MyRewards />
+            </ChildProtectedRoute>
+          }
+        />
+        <Route
+          path="/history/:id"
+          element={
+            <ChildProtectedRoute>
+              <HabitHistory />
             </ChildProtectedRoute>
           }
         />

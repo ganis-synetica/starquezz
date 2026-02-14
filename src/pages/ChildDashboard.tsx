@@ -219,12 +219,15 @@ export function ChildDashboard() {
         </div>
 
         {/* Action Buttons */}
-        <div className="grid grid-cols-2 gap-3 mb-3">
-          <Button className="bg-gold text-charcoal hover:bg-gold-light" size="lg" onClick={() => navigate(`/store/${childId}`)}>
-            🛒 Star Store
+        <div className="grid grid-cols-3 gap-2 mb-3">
+          <Button className="bg-gold text-charcoal hover:bg-gold-light" size="sm" onClick={() => navigate(`/store/${childId}`)}>
+            🛒 Store
           </Button>
-          <Button className="bg-lavender text-charcoal hover:bg-lavender-light" size="lg" onClick={() => navigate(`/rewards/${childId}`)}>
-            🎁 My Rewards
+          <Button className="bg-lavender text-charcoal hover:bg-lavender-light" size="sm" onClick={() => navigate(`/rewards/${childId}`)}>
+            🎁 Rewards
+          </Button>
+          <Button className="bg-sage text-charcoal hover:bg-sage-light" size="sm" onClick={() => navigate(`/history/${childId}`)}>
+            📅 History
           </Button>
         </div>
 

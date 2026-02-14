@@ -28,7 +28,7 @@
 - [x] Quick switch between children from dashboard
 - [x] Habit completion animations / sounds
 - [x] Streak counter on dashboard
-- [ ] Habit history view (past completions)
+- [x] Habit history view (past completions)
 - [ ] Achievement badges
 
 ### 🟡 Parent Experience  
