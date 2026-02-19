@@ -39,7 +39,8 @@ export function ParentSignUp() {
     setIsLoading(true)
     try {
       await signUp(email, password)
-      navigate('/parent/approvals')
+      // Go directly to setup wizard, skip intro carousel
+      navigate('/onboarding')
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Sign up failed. Please try again.')
     } finally {
