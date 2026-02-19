@@ -615,6 +615,39 @@ export function OnboardingWizard() {
     }
   }
 
+  // Step indicator logic
+  const getStepInfo = (): { current: number; total: number; label: string } | null => {
+    if (step.stage === 'welcome') return null
+    const totalKids = kidCount ?? 1
+    // Steps: 1=How many kids, 2..=Kid details+focus+habits (per kid), then Store setup, then Rewards, then Ready
+    // Simplified into 5 high-level steps
+    const stages = [
+      'How many kids',
+      ...Array.from({ length: totalKids }, (_, i) => `Set up ${kids[i]?.name || `Kid ${i + 1}`}`),
+      'Store setup',
+      'Review rewards',
+      'Ready to go!',
+    ]
+    const total = stages.length
+
+    let current = 1
+    if (step.stage === 'kid-count') {
+      current = 1
+    } else if (step.stage === 'kid-details' || step.stage === 'focus' || step.stage === 'habits') {
+      current = 2 + step.index
+    } else if (step.stage === 'store') {
+      current = 2 + totalKids
+    } else if (step.stage === 'store-suggestions') {
+      current = 3 + totalKids
+    } else if (step.stage === 'ready') {
+      current = total
+    }
+
+    return { current, total, label: stages[current - 1] ?? '' }
+  }
+
+  const stepInfo = getStepInfo()
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-cream to-coral-light p-4 md:p-8">
       <div className="max-w-3xl mx-auto space-y-4">
@@ -629,6 +662,22 @@ export function OnboardingWizard() {
             </Button>
           )}
         </div>
+
+        {/* Step indicator */}
+        {stepInfo && (
+          <div className="space-y-2">
+            <div className="flex justify-between items-center text-sm font-bold text-charcoal-light">
+              <span>Step {stepInfo.current} of {stepInfo.total}: {stepInfo.label}</span>
+            </div>
+            <div className="w-full bg-charcoal/10 rounded-full h-3 overflow-hidden">
+              <div
+                className="h-full bg-lavender rounded-full transition-all duration-500 ease-out"
+                style={{ width: `${(stepInfo.current / stepInfo.total) * 100}%` }}
+              />
+            </div>
+          </div>
+        )}
+
         <Card className="bg-white/90 backdrop-blur border-4 border-charcoal">
           <CardContent className="p-6">{renderStep()}</CardContent>
         </Card>
