@@ -53,7 +53,7 @@ export function ParentSignUp() {
       <div className="max-w-md mx-auto pt-10">
         <div className="text-center mb-6">
           <h1 className="text-4xl font-black text-charcoal">Create Parent Account</h1>
-          <p className="text-lg font-bold text-charcoal">Let’s set up your quest HQ.</p>
+          <p className="text-lg font-bold text-charcoal">Let's set up your quest HQ.</p>
         </div>
 
         <Card className="bg-card">
@@ -100,4 +100,3 @@ export function ParentSignUp() {
     </div>
   )
 }
-
