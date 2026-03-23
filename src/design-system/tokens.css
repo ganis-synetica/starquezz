@@ -1,0 +1,367 @@
+/**
+ * WONDERVERSE Design System — CSS Custom Properties
+ * Margaery 🎨 | Synetica Design Ops | StarqueZZ Phase 2
+ *
+ * Usage:
+ *   Import this file in your root CSS or main.tsx:
+ *     @import './design-system/tokens.css';
+ *
+ *   Access via:
+ *     background-color: var(--color-quest-gold);
+ *     font-family: var(--font-quest);
+ *
+ * Mode switching:
+ *   Child (quest) UI:  <div data-mode="quest">
+ *   Parent (mission):  <div data-mode="mission">
+ *
+ * Reduced motion:
+ *   Automatically disables all transitions when
+ *   prefers-reduced-motion: reduce is detected.
+ */
+
+/* ══════════════════════════════════════════════
+   TAILWIND v4 THEME BLOCK
+   Used by @tailwindcss/vite to generate utilities
+   ══════════════════════════════════════════════ */
+@layer theme {
+  :root {
+    /* ── Child Color Tokens ─────────────────── */
+    --color-quest-deep-space:          #1A0F3C;
+    --color-quest-midnight-cosmos:     #0F0A24;
+    --color-quest-nebula-surface:      #2A1F5F;
+    --color-quest-gold:                #FFB800;
+    --color-quest-gold-light:          #FFD54F;
+    --color-quest-nebula-violet:       #7C3AED;
+    --color-quest-nebula-violet-light: #A78BFA;
+    --color-quest-cosmic-coral:        #FF6B6B;
+    --color-quest-aurora-mint:         #4ADE80;
+    --color-quest-moonbeam:            #F5F0FF;
+    --color-quest-star-white:          #FFFDF5;
+    --color-quest-stardust:            #6B5B8E;
+    --color-quest-cosmic-teal:         #22D3EE;
+
+    /* ── Parent Color Tokens ─────────────────── */
+    --color-mission-command-navy:       #1E3A5F;
+    --color-mission-horizon-blue:       #2563EB;
+    --color-mission-horizon-blue-light: #3B82F6;
+    --color-mission-cloud-white:        #F8FAFF;
+    --color-mission-surface-white:      #FFFFFF;
+    --color-mission-border-gray:        #E2E8F0;
+    --color-mission-slate-text:         #334155;
+    --color-mission-muted-text:         #64748B;
+    --color-mission-placeholder:        #94A3B8;
+    --color-mission-success:            #22C55E;
+    --color-mission-alert-red:          #EF4444;
+    --color-mission-gold-amber:         #F59E0B;
+    --color-mission-streak-orange:      #F97316;
+
+    /* ── Shared Semantic Tokens ─────────────── */
+    --color-star:           #FFB800;
+    --color-pending:        #F59E0B;
+    --color-success-child:  #4ADE80;
+    --color-success-parent: #22C55E;
+    --color-locked-child:   #6B5B8E;
+    --color-locked-parent:  #94A3B8;
+    --color-error-child:    #FF6B6B;
+    --color-error-parent:   #EF4444;
+
+    /* ── Typography Tokens ───────────────────── */
+    --font-quest:   "Nunito", ui-rounded, system-ui, sans-serif;
+    --font-mission: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
+    --font-mono:    "JetBrains Mono", ui-monospace, "SFMono-Regular", monospace;
+
+    --font-weight-regular:   400;
+    --font-weight-medium:    500;
+    --font-weight-semibold:  600;
+    --font-weight-bold:      700;
+    --font-weight-extrabold: 800;
+    --font-weight-black:     900;
+
+    /* Child type scale */
+    --font-size-display-xl: 48px;
+    --font-size-display:    36px;
+    --font-size-heading-1:  28px;
+    --font-size-heading-2:  22px;
+    --font-size-heading-3:  18px;
+    --font-size-body-lg:    16px;
+    --font-size-body:       14px;
+    --font-size-caption:    12px;
+
+    /* Parent type scale */
+    --font-size-p-display:   28px;
+    --font-size-p-heading-1: 22px;
+    --font-size-p-heading-2: 18px;
+    --font-size-p-heading-3: 16px;
+    --font-size-p-body-lg:   16px;
+    --font-size-p-body:      14px;
+    --font-size-p-small:     12px;
+    --font-size-p-label:     11px;
+
+    /* Line heights */
+    --line-height-tight:   1.1;
+    --line-height-snug:    1.25;
+    --line-height-normal:  1.5;
+    --line-height-relaxed: 1.6;
+
+    /* Letter spacing */
+    --tracking-tight:    -0.5px;
+    --tracking-normal:   0;
+    --tracking-label:    0.08em;
+
+    /* ── Spacing Tokens (8px grid) ──────────── */
+    --space-xs:  4px;
+    --space-sm:  8px;
+    --space-md:  16px;
+    --space-lg:  24px;
+    --space-xl:  32px;
+    --space-2xl: 48px;
+    --space-3xl: 64px;
+
+    /* ── Border Radius ───────────────────────── */
+    --radius-pill:    9999px;
+    --radius-card:    16px;
+    --radius-card-lg: 20px;
+    --radius-soft:    12px;
+    --radius-subtle:  8px;
+
+    /* ── Box Shadows ─────────────────────────── */
+    --shadow-xs:          0 1px 3px rgba(0, 0, 0, 0.08);
+    --shadow-sm:          0 2px 8px rgba(0, 0, 0, 0.12);
+    --shadow-md:          0 4px 16px rgba(0, 0, 0, 0.16);
+    --shadow-lg:          0 8px 32px rgba(0, 0, 0, 0.24);
+    --shadow-glow-gold:   0 0 20px rgba(255, 184, 0, 0.4), 0 4px 12px rgba(255, 184, 0, 0.5);
+    --shadow-glow-violet: 0 0 16px rgba(124, 58, 237, 0.35);
+    --shadow-glow-mint:   0 0 12px rgba(74, 222, 128, 0.35);
+    --shadow-glow-coral:  0 0 12px rgba(255, 107, 107, 0.35);
+
+    /* ── Gradients ───────────────────────────── */
+    --gradient-space-bg:      linear-gradient(180deg, #1A0F3C 0%, #0F0A24 60%, #1A1040 100%);
+    --gradient-card-core:     linear-gradient(135deg, #2A1F5F 0%, #1E1650 100%);
+    --gradient-gold:          linear-gradient(135deg, #FFB800 0%, #FFD54F 100%);
+    --gradient-parent-header: linear-gradient(135deg, #1E3A5F 0%, #2563EB 100%);
+    --gradient-nebula-violet: linear-gradient(135deg, #7C3AED 0%, #A78BFA 100%);
+
+    /* ── Animation Duration ──────────────────── */
+    --duration-instant:    100ms;
+    --duration-quick:      200ms;
+    --duration-standard:   350ms;
+    --duration-expressive: 500ms;
+    --duration-extended:   800ms;
+
+    /* Parent mode timings */
+    --duration-p-instant:  80ms;
+    --duration-p-quick:    150ms;
+    --duration-p-standard: 250ms;
+    --duration-p-extended: 400ms;
+
+    /* ── Easing Tokens ───────────────────────── */
+    --ease-snappy: cubic-bezier(0.34, 1.56, 0.64, 1);
+    --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+    --ease-out:    cubic-bezier(0, 0, 0.2, 1);
+    --ease-in:     cubic-bezier(0.4, 0, 1, 1);
+  }
+}
+
+/* ══════════════════════════════════════════════
+   QUEST MODE (Child UI — dark space theme)
+   Apply via: <div data-mode="quest"> or <body data-mode="quest">
+   ══════════════════════════════════════════════ */
+[data-mode="quest"] {
+  color-scheme: dark;
+
+  /* Semantic aliases mapped to child values */
+  --color-bg:           var(--color-quest-deep-space);
+  --color-bg-deep:      var(--color-quest-midnight-cosmos);
+  --color-surface:      var(--color-quest-nebula-surface);
+  --color-primary:      var(--color-quest-gold);
+  --color-primary-hover:var(--color-quest-gold-light);
+  --color-secondary:    var(--color-quest-nebula-violet);
+  --color-secondary-lt: var(--color-quest-nebula-violet-light);
+  --color-text:         var(--color-quest-star-white);
+  --color-text-muted:   var(--color-quest-stardust);
+  --color-success:      var(--color-quest-aurora-mint);
+  --color-error:        var(--color-quest-cosmic-coral);
+  --color-locked:       var(--color-quest-stardust);
+  --color-accent:       var(--color-quest-cosmic-teal);
+
+  --font-primary:       var(--font-quest);
+  --btn-radius:         var(--radius-pill);
+  --btn-primary-bg:     var(--color-quest-gold);
+  --btn-primary-text:   var(--color-quest-deep-space);
+  --btn-shadow:         var(--shadow-glow-gold);
+
+  background: var(--gradient-space-bg);
+  color: var(--color-quest-star-white);
+  font-family: var(--font-quest);
+}
+
+/* ══════════════════════════════════════════════
+   MISSION MODE (Parent UI — light/airy theme)
+   Apply via: <div data-mode="mission"> or <body data-mode="mission">
+   ══════════════════════════════════════════════ */
+[data-mode="mission"] {
+  color-scheme: light;
+
+  /* Semantic aliases mapped to parent values */
+  --color-bg:           var(--color-mission-cloud-white);
+  --color-bg-deep:      var(--color-mission-cloud-white);
+  --color-surface:      var(--color-mission-surface-white);
+  --color-primary:      var(--color-mission-horizon-blue);
+  --color-primary-hover:var(--color-mission-horizon-blue-light);
+  --color-secondary:    var(--color-mission-command-navy);
+  --color-secondary-lt: var(--color-mission-muted-text);
+  --color-text:         var(--color-mission-slate-text);
+  --color-text-muted:   var(--color-mission-muted-text);
+  --color-success:      var(--color-mission-success);
+  --color-error:        var(--color-mission-alert-red);
+  --color-locked:       var(--color-mission-placeholder);
+  --color-accent:       var(--color-mission-streak-orange);
+
+  --font-primary:       var(--font-mission);
+  --btn-radius:         var(--radius-soft);
+  --btn-primary-bg:     var(--color-mission-horizon-blue);
+  --btn-primary-text:   #ffffff;
+  --btn-shadow:         var(--shadow-sm);
+
+  background-color: var(--color-mission-cloud-white);
+  color: var(--color-mission-slate-text);
+  font-family: var(--font-mission);
+}
+
+/* ══════════════════════════════════════════════
+   KEYFRAME ANIMATIONS
+   ══════════════════════════════════════════════ */
+
+@keyframes star-earn {
+  0%   { transform: translate(0, 0) scale(1);           opacity: 1; }
+  60%  { transform: translate(-10px, -60px) scale(1.3); opacity: 1; }
+  100% { transform: translate(-20px, -120px) scale(0.6);opacity: 0; }
+}
+
+@keyframes star-receive {
+  0%   { transform: scale(1) rotate(0deg);   }
+  30%  { transform: scale(1.35) rotate(15deg); }
+  60%  { transform: scale(0.95) rotate(-5deg); }
+  100% { transform: scale(1) rotate(0deg);   }
+}
+
+@keyframes bounce-spring {
+  0%   { transform: scale(0.96); }
+  40%  { transform: scale(1.06); }
+  70%  { transform: scale(0.99); }
+  100% { transform: scale(1);    }
+}
+
+@keyframes float {
+  0%   { transform: translateY(0);    }
+  50%  { transform: translateY(-6px); }
+  100% { transform: translateY(0);    }
+}
+
+@keyframes sparkle {
+  0%   { transform: scale(0.8); opacity: 0; }
+  50%  { transform: scale(1.2); opacity: 1; }
+  100% { transform: scale(1);   opacity: 0; }
+}
+
+@keyframes shake {
+  0%   { transform: translateX(0);   }
+  15%  { transform: translateX(-8px);}
+  30%  { transform: translateX(8px); }
+  45%  { transform: translateX(-8px);}
+  60%  { transform: translateX(8px); }
+  75%  { transform: translateX(-4px);}
+  90%  { transform: translateX(4px); }
+  100% { transform: translateX(0);   }
+}
+
+@keyframes pulse-glow {
+  0%   { box-shadow: 0 0 8px  rgba(255, 184, 0, 0.2); }
+  50%  { box-shadow: 0 0 24px rgba(255, 184, 0, 0.6); }
+  100% { box-shadow: 0 0 8px  rgba(255, 184, 0, 0.2); }
+}
+
+@keyframes ring-fill {
+  from { stroke-dashoffset: var(--ring-circumference, 251.2); }
+  to   { stroke-dashoffset: var(--ring-offset, 0); }
+}
+
+@keyframes burst {
+  0%   { transform: translate(0, 0) scale(1);             opacity: 1; }
+  100% { transform: var(--burst-translate, translate(0,0)) scale(0); opacity: 0; }
+}
+
+@keyframes wobble {
+  0%   { transform: rotate(0deg);  }
+  15%  { transform: rotate(-8deg); }
+  30%  { transform: rotate(8deg);  }
+  45%  { transform: rotate(-4deg); }
+  60%  { transform: rotate(4deg);  }
+  100% { transform: rotate(0deg);  }
+}
+
+@keyframes fade-slide-up {
+  from { transform: translateY(20px); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+
+@keyframes scale-in {
+  from { transform: scale(0);   opacity: 0; }
+  to   { transform: scale(1);   opacity: 1; }
+}
+
+/* ── Animation utility classes ────────────── */
+.animate-star-earn    { animation: star-earn    var(--duration-expressive) var(--ease-smooth) forwards; }
+.animate-star-receive { animation: star-receive var(--duration-standard)   var(--ease-snappy) both; }
+.animate-bounce-spring{ animation: bounce-spring var(--duration-standard)  var(--ease-snappy) both; }
+.animate-float        { animation: float        3s ease-in-out infinite; }
+.animate-sparkle      { animation: sparkle      600ms ease-out forwards; }
+.animate-shake        { animation: shake        var(--duration-expressive) cubic-bezier(0.36, 0.07, 0.19, 0.97) both; }
+.animate-pulse-glow   { animation: pulse-glow   8s ease-in-out infinite; }
+.animate-burst        { animation: burst        400ms var(--ease-smooth) forwards; }
+.animate-wobble       { animation: wobble       600ms ease-in-out both; }
+.animate-fade-up      { animation: fade-slide-up var(--duration-standard) var(--ease-smooth) both; }
+.animate-scale-in     { animation: scale-in     var(--duration-standard)  var(--ease-snappy) both; }
+
+/* Stagger helpers (add --stagger-delay per child via inline style) */
+.animate-stagger { animation-delay: var(--stagger-delay, 0ms); }
+
+/* ══════════════════════════════════════════════
+   REDUCED MOTION — WCAG 2.3 COMPLIANCE
+   ══════════════════════════════════════════════ */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration:       0.01ms !important;
+    animation-iteration-count: 1     !important;
+    transition-duration:      0.01ms !important;
+    scroll-behavior:          auto   !important;
+  }
+}
+
+/* ══════════════════════════════════════════════
+   GLOBAL BASE RESETS (applied when this file imported)
+   ══════════════════════════════════════════════ */
+:root {
+  -webkit-font-smoothing:  antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+/* PWA safe area padding */
+.safe-top    { padding-top:    env(safe-area-inset-top,    0px); }
+.safe-bottom { padding-bottom: env(safe-area-inset-bottom, 0px); }
+.safe-left   { padding-left:   env(safe-area-inset-left,   0px); }
+.safe-right  { padding-right:  env(safe-area-inset-right,  0px); }
+
+/* Star field background (pure CSS, child landing) */
+.starfield {
+  background-image:
+    radial-gradient(1px  1px at 20%  30%, rgba(255,255,255,0.8) 0%, transparent 100%),
+    radial-gradient(1px  1px at 75%  15%, rgba(255,255,255,0.6) 0%, transparent 100%),
+    radial-gradient(1.5px 1.5px at 45% 65%, rgba(255,255,255,0.5) 0%, transparent 100%),
+    radial-gradient(1px  1px at 90%  50%, rgba(255,255,255,0.7) 0%, transparent 100%),
+    radial-gradient(1px  1px at 10%  80%, rgba(255,255,255,0.6) 0%, transparent 100%),
+    radial-gradient(1px  1px at 60%  90%, rgba(255,255,255,0.4) 0%, transparent 100%);
+}
